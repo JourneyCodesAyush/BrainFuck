@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
 #include <stack>
 #include <unordered_map>
 #include <string>
@@ -15,7 +14,7 @@ namespace interpreter
     {
     private:
         std::string source;
-        size_t current_char;
+        size_t instruction_pointer;
         int line;
         int memory_pointer;
         std::uint8_t memory[MAX_SIZE];

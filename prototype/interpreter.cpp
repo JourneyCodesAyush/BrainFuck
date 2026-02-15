@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <cstdint>
 
@@ -12,7 +11,7 @@ namespace interpreter
     {
         this->source = "";
         this->line = 0;
-        this->current_char = 0;
+        this->instruction_pointer = 0;
         this->memory_pointer = 0;
     }
 
@@ -20,7 +19,7 @@ namespace interpreter
     {
         this->source = source;
         this->line = 0;
-        this->current_char = 0;
+        this->instruction_pointer = 0;
         this->memory_pointer = 0;
     }
 
@@ -35,10 +34,10 @@ namespace interpreter
 
     void Interpreter::source_brackets_trace()
     {
-        while (current_char < source.size())
+        while (instruction_pointer < source.size())
         {
             // std::cout << "Tracing brackets...\n";
-            char c = source.at(current_char);
+            char c = source.at(instruction_pointer);
             int popped = -1;
             switch (c)
             {
@@ -46,21 +45,21 @@ namespace interpreter
                 line++;
                 break;
             case '[':
-                trace_brackets.push(current_char);
-                // brackets[current_char] = -1;
+                trace_brackets.push(instruction_pointer);
+                // brackets[instruction_pointer] = -1;
                 break;
             case ']':
                 if (trace_brackets.empty())
                 {
-                    std::cerr << "Unbalanced bracket at position " << current_char << "\n";
+                    std::cerr << "Unbalanced bracket at position " << instruction_pointer << "\n";
                     exit(EXIT_FAILURE);
                 }
                 popped = trace_brackets.top();
                 trace_brackets.pop();
-                // brackets[popped] = current_char;
+                // brackets[popped] = instruction_pointer;
 
-                brackets[popped] = current_char;
-                brackets[current_char] = popped;
+                brackets[popped] = instruction_pointer;
+                brackets[instruction_pointer] = popped;
                 break;
             default:
                 break;
@@ -85,12 +84,12 @@ namespace interpreter
 
     void Interpreter::reset_current_pointer()
     {
-        current_char = 0;
+        instruction_pointer = 0;
     }
 
     void Interpreter::advance()
     {
-        current_char++;
+        instruction_pointer++;
     }
 
     void Interpreter::increment_memory_pointer()
@@ -155,9 +154,9 @@ namespace interpreter
         // std::cout << "Inside interpret method..\n";
         try
         {
-            while (current_char < source.size())
+            while (instruction_pointer < source.size())
             {
-                char c = source.at(current_char);
+                char c = source.at(instruction_pointer);
                 switch (c)
                 {
                 case '>':
@@ -182,11 +181,11 @@ namespace interpreter
 
                 case '[':
                     if (memory[memory_pointer] == 0)
-                        current_char = brackets[current_char];
+                        instruction_pointer = brackets[instruction_pointer];
                     break;
                 case ']':
                     if (memory[memory_pointer] != 0)
-                        current_char = brackets[current_char];
+                        instruction_pointer = brackets[instruction_pointer];
                     break;
                 default:
                     // std::cout << "Comment encountered...\n";
