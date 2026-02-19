@@ -37,3 +37,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Zig files
+.zig-cache/
+zig-out/
