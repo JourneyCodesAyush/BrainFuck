@@ -7,20 +7,18 @@
 
 namespace interpreter
 {
-    Interpreter::Interpreter()
+    Interpreter::Interpreter(std::istream &input_stream)
+        : input(input_stream), instruction_pointer(0), line(0), memory_pointer(0)
     {
-        this->source = "";
-        this->line = 0;
-        this->instruction_pointer = 0;
-        this->memory_pointer = 0;
+        source = "";
+        // memory is already initialized in the header
     }
 
-    Interpreter::Interpreter(const std::string &source)
+    Interpreter::Interpreter(const std::string &source_str, std::istream &input_stream)
+        : input(input_stream), instruction_pointer(0), line(0), memory_pointer(0)
     {
-        this->source = source;
-        this->line = 0;
-        this->instruction_pointer = 0;
-        this->memory_pointer = 0;
+        source = source_str;
+        // memory already zeroed
     }
 
     Interpreter::~Interpreter()
@@ -134,7 +132,7 @@ namespace interpreter
 
     void Interpreter::take_input()
     {
-        int ch = std::cin.get();
+        int ch = input.get();
         if (ch == EOF)
         {
             memory[memory_pointer] = 255;
@@ -145,10 +143,14 @@ namespace interpreter
                 ch = 10;
             memory[memory_pointer] = static_cast<uint8_t>(ch);
         }
+
+        if (input.peek() == '\n')
+            input.get();
     }
 
     void Interpreter::interpret()
     {
+        reset_current_pointer();
         source_brackets_trace();
         reset_current_pointer();
         // std::cout << "Inside interpret method..\n";
@@ -169,7 +171,7 @@ namespace interpreter
                     print_memory_pointer();
                     break;
                 case ',':
-                    std::cout << "> ";
+                    // std::cout << "> ";
                     take_input();
                     break;
                 case '+':

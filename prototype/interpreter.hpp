@@ -13,6 +13,7 @@ namespace interpreter
     class Interpreter
     {
     private:
+        std::istream &input;
         std::string source;
         size_t instruction_pointer;
         int line;
@@ -35,8 +36,8 @@ namespace interpreter
         void take_input();
 
     public:
-        Interpreter();
-        Interpreter(const std::string &source);
+        Interpreter(std::istream &input_stream = std::cin);
+        Interpreter(const std::string &source_str, std::istream &input_stream = std::cin);
         void interpret();
         void set_source(const std::string &source);
         ~Interpreter();
