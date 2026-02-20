@@ -3,7 +3,6 @@
 #include <cstdint>
 
 #include "interpreter.hpp"
-#define MAX_SIZE 32768
 
 namespace interpreter
 {
