@@ -82,10 +82,9 @@ pub const Interpreter = struct {
 
     pub fn setSource(self: *Interpreter, source_code: []const u8) Errors!void {
         self.source = source_code;
-        self.brackets = try self.allocator.alloc(usize, source_code.len);
-        self.trace_brackets.deinit();
-        self.trace_brackets = std.ArrayList(usize).init(self.allocator);
-        std.mem.set(usize, self.brackets, 0);
+
+        self.brackets.clearRetainingCapacity();
+        self.trace_brackets.clearRetainingCapacity();
     }
 
     pub fn interpret(self: *Interpreter) Errors!void {
