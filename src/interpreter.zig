@@ -2,10 +2,7 @@ const std = @import("std");
 
 const max_size: usize = 32_768;
 
-const Errors = error{
-    UnbalancedOpeningBracket,
-    UnbalancedClosingBracket,
-};
+pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory };
 
 pub const Interpreter = struct {
     memory: [max_size]u8,
@@ -17,14 +14,14 @@ pub const Interpreter = struct {
     trace_brackets: std.ArrayList(usize),
 
     allocator: *std.mem.Allocator,
-    pub fn init(self: *Interpreter, source_code: []const u8, allocator: *std.mem.Allocator) !void {
+    pub fn init(self: *Interpreter, source_code: []const u8, allocator: *std.mem.Allocator) Errors!void {
         self.memory_pointer = max_size / 2;
         self.instruction_pointer = 0;
         self.source = source_code;
         self.allocator = allocator;
         @memset(&self.memory, 0);
 
-        self.brackets = try std.AutoHashMap(usize, usize).init(allocator.*);
+        self.brackets = std.AutoHashMap(usize, usize).init(allocator.*);
         self.trace_brackets = try std.ArrayList(usize).initCapacity(allocator.*, 32);
     }
 
@@ -60,7 +57,7 @@ pub const Interpreter = struct {
         self.instruction_pointer = 0;
     }
 
-    fn sourceBracketsTrace(self: *Interpreter) !void {
+    fn sourceBracketsTrace(self: *Interpreter) Errors!void {
         self.instruction_pointer = 0;
         while (self.instruction_pointer < self.source.len) : (self.instruction_pointer += 1) {
             const c = self.source[self.instruction_pointer];
@@ -83,7 +80,7 @@ pub const Interpreter = struct {
         self.instruction_pointer += 1;
     }
 
-    pub fn setSource(self: *Interpreter, source_code: []const u8) !void {
+    pub fn setSource(self: *Interpreter, source_code: []const u8) Errors!void {
         self.source = source_code;
         self.brackets = try self.allocator.alloc(usize, source_code.len);
         self.trace_brackets.deinit();
@@ -91,7 +88,7 @@ pub const Interpreter = struct {
         std.mem.set(usize, self.brackets, 0);
     }
 
-    pub fn interpret(self: *Interpreter) !void {
+    pub fn interpret(self: *Interpreter) Errors!void {
         // self.instruction_pointer = 0;
         self.resetInstructionPointer();
         try self.sourceBracketsTrace();
