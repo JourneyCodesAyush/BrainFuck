@@ -22,6 +22,11 @@ fn runFile(filename: []const u8) !void {
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
+    if (!(std.mem.endsWith(u8, filename, ".b") or std.mem.endsWith(u8, filename, ".bf"))) {
+        std.debug.print("Use .b or .bf extension for BrainF*ck source files\n", .{});
+        return;
+    }
+
     // Read entire file
     const source = try std.fs.cwd().readFileAlloc(
         allocator,
