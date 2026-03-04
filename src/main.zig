@@ -11,6 +11,7 @@ fn run(intrprt: *interpreter.Interpreter, source: []const u8) void {
         const msg = switch (e) {
             interpreter.Errors.UnbalancedOpeningBracket => "Error: unmatched '['",
             interpreter.Errors.UnbalancedClosingBracket => "Error: unmatched ']'",
+            interpreter.Errors.IOError => "I/O error occurred",
             else => "Unknown error during interpret",
         };
         std.debug.print("{s}\n", .{msg});
