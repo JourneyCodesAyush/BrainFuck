@@ -2,7 +2,7 @@ const std = @import("std");
 
 const max_size: usize = 32_768;
 
-pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory };
+pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory, IOError };
 
 pub const Interpreter = struct {
     memory: [max_size]u8,
@@ -57,6 +57,25 @@ pub const Interpreter = struct {
         self.instruction_pointer = 0;
     }
 
+    fn takeInput(self: *Interpreter) Errors!void {
+        const stdin = std.fs.File.stdin();
+
+        var buf: [1]u8 = undefined;
+
+        const n = stdin.read(&buf) catch return Errors.IOError;
+        if (n == 0) {
+            return Errors.IOError;
+        }
+        var byte = buf[0];
+
+        // Windows CR (13) → LF (10)
+        if (byte == 13) {
+            byte = 10;
+        }
+
+        self.memory[self.memory_pointer] = byte;
+    }
+
     fn sourceBracketsTrace(self: *Interpreter) Errors!void {
         self.instruction_pointer = 0;
         while (self.instruction_pointer < self.source.len) : (self.instruction_pointer += 1) {
@@ -104,6 +123,9 @@ pub const Interpreter = struct {
                 '.' => std.debug.print("{c}", .{
                     self.memory[self.memory_pointer],
                 }),
+                ',' => {
+                    try self.takeInput();
+                },
                 '[' => {
                     if (self.memory[self.memory_pointer] == 0) {
                         const jump_to = self.brackets.get(self.instruction_pointer) orelse return Errors.UnbalancedOpeningBracket;
