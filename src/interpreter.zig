@@ -58,22 +58,31 @@ pub const Interpreter = struct {
     }
 
     fn takeInput(self: *Interpreter) Errors!void {
-        const stdin = std.fs.File.stdin();
-
         var buf: [1]u8 = undefined;
+        var stdin = std.fs.File.stdin();
 
+        std.debug.print("> ", .{});
         const n = stdin.read(&buf) catch return Errors.IOError;
-        if (n == 0) {
-            return Errors.IOError;
-        }
-        var byte = buf[0];
 
-        // Windows CR (13) → LF (10)
-        if (byte == 13) {
-            byte = 10;
-        }
+        if (n == 0) return Errors.IOError;
 
-        self.memory[self.memory_pointer] = byte;
+        self.memory[self.memory_pointer] = buf[0];
+
+        // Clear any remaining input from this line
+        var tmp: [1024]u8 = undefined;
+        while (true) {
+            const r = stdin.read(&tmp) catch break;
+            if (r == 0) break;
+            // Check if the read chunk contains a newline
+            var found: bool = false;
+            for (tmp[0..r]) |b| {
+                if (b == 10 or b == 13) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) break;
+        }
     }
 
     fn sourceBracketsTrace(self: *Interpreter) Errors!void {
