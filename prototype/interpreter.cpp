@@ -145,9 +145,8 @@ namespace interpreter
                 ch = 10;
             memory[memory_pointer] = static_cast<uint8_t>(ch);
         }
-
-        if (input.peek() == '\n')
-            input.get();
+        std::string temp;
+        std::getline(input, temp);
     }
 
     void Interpreter::interpret()
