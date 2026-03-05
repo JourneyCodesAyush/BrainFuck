@@ -27,6 +27,9 @@ namespace interpreter
     void Interpreter::set_source(const std::string &source)
     {
         this->source = source;
+        reset_current_pointer();
+        source_brackets_trace();
+        reset_current_pointer();
     }
 
     void Interpreter::source_brackets_trace()
@@ -149,9 +152,6 @@ namespace interpreter
 
     void Interpreter::interpret()
     {
-        reset_current_pointer();
-        source_brackets_trace();
-        reset_current_pointer();
         // std::cout << "Inside interpret method..\n";
         try
         {
