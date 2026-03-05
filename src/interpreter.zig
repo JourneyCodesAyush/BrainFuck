@@ -104,14 +104,14 @@ pub const Interpreter = struct {
 
         self.brackets.clearRetainingCapacity();
         self.trace_brackets.clearRetainingCapacity();
-    }
 
-    pub fn interpret(self: *Interpreter) Errors!void {
-        // self.instruction_pointer = 0;
+        // Compute brackets when source is set instead of at run time
         self.resetInstructionPointer();
         try self.sourceBracketsTrace();
         self.resetInstructionPointer();
+    }
 
+    pub fn interpret(self: *Interpreter) Errors!void {
         while (self.instruction_pointer < self.source.len) {
             const instruction = self.source[self.instruction_pointer];
 
