@@ -142,6 +142,18 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_mod_tests.step);
     test_step.dependOn(&run_exe_tests.step);
 
+    const clean_step = b.step("clean", "Clean build artifacts");
+
+    clean_step.makeFn = struct {
+        fn run(_: *std.Build.Step, _: std.Build.Step.MakeOptions) !void {
+            var cwd = std.fs.cwd();
+            std.debug.print("Cleaning build artifacts...\n", .{});
+            cwd.deleteTree(".zig-cache") catch {};
+            cwd.deleteTree("zig-out") catch {};
+            std.debug.print("Done!\n", .{});
+        }
+    }.run;
+
     // Just like flags, top level steps are also listed in the `--help` menu.
     //
     // The Zig build system is entirely implemented in userland, which means
