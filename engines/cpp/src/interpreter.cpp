@@ -134,6 +134,7 @@ namespace interpreter
 
     void Interpreter::take_input()
     {
+        std::cout << "> ";
         int ch = input.get();
         if (ch == EOF)
         {
