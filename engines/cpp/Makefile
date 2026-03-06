@@ -3,8 +3,8 @@ CC = g++
 CFLAGS = -Wall -g -std=c++17
 
 # Source and header directories
-SRC_DIR = prototype
-INC_DIR = prototype
+SRC_DIR = src
+INC_DIR = src
 BUILD_DIR = makeBuild
 
 # Source and header files

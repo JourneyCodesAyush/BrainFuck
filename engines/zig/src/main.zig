@@ -1,6 +1,17 @@
 const std = @import("std");
 const interpreter = @import("interpreter.zig");
 
+fn print_help() void {
+    std.debug.print(" ____            _       _____           _    \n", .{});
+    std.debug.print("| __ ) _ __ __ _(_)_ __ |  ___|_/\\__ ___| | __\n", .{});
+    std.debug.print("|  _ \\| '__/ _` | | '_ \\| |_  \\    // __| |/ /\n", .{});
+    std.debug.print("| |_) | | | (_| | | | | |  _| /_  _\\ (__|   < \n", .{});
+    std.debug.print("|____/|_|  \\__,_|_|_| |_|_|     \\/  \\___|_|\\_\\\n  ", .{});
+
+    std.debug.print("\nStart with this 'Hello World' program\n", .{});
+    std.debug.print("++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>\n\n", .{});
+}
+
 fn run(intrprt: *interpreter.Interpreter, source: []const u8) void {
     intrprt.setSource(source) catch |e| {
         std.debug.print("SetSource error: {any}\n", .{e});
@@ -19,6 +30,7 @@ fn run(intrprt: *interpreter.Interpreter, source: []const u8) void {
 }
 
 fn runPrompt() !void {
+    print_help();
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
