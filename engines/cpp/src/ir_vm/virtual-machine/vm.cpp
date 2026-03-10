@@ -40,6 +40,7 @@ namespace vm
         while (this->ip < instructions_size)
         {
             const auto &instr = this->instructions[this->ip];
+            bool advanced = false;
             switch (instr.opcode)
             {
             case instruction::OpCode::ADD:
@@ -55,26 +56,33 @@ namespace vm
                 this->take_input();
                 break;
             case instruction::OpCode::OUTPUT:
-                std::cout << this->memory[this->memory_pointer];
+                std::cout << static_cast<char>(this->memory[this->memory_pointer]);
                 break;
             case instruction::OpCode::JZ:
                 if (this->memory[this->memory_pointer] == 0)
                     this->ip = instr.argument;
                 else
+                {
                     this->advance();
+                    advanced = true;
+                }
                 break;
 
             case instruction::OpCode::JNZ:
                 if (this->memory[this->memory_pointer] != 0)
                     this->ip = instr.argument;
                 else
+                {
+                    advanced = true;
                     this->advance();
+                }
                 break;
 
             default:
                 break;
             }
-            this->advance();
+            if (!advanced)
+                this->advance();
         }
     }
 } // namespace vm
