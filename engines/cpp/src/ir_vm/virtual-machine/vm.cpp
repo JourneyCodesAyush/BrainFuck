@@ -11,6 +11,11 @@ namespace vm
         this->ip++;
     }
 
+    void VirtualMachine::setInstructions(const std::vector<instruction::Instruction> &instructions)
+    {
+        this->instructions = instructions;
+    }
+
     void VirtualMachine::take_input()
     {
         std::cout << "> ";
