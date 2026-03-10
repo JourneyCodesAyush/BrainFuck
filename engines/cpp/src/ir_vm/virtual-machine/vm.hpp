@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include "../instruction/opcode.hpp"
 
 #define MAX_SIZE 32768
