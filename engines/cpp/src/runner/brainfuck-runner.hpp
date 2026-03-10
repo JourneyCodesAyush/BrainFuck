@@ -33,7 +33,7 @@ namespace runner
     public:
         BrainFuckRunner(Mode mode = Mode::CHAR) : source(""), mode(mode) {}
         void runRepl();
-        void runFromFile(std::string &filename);
+        void runFromFile(const std::string &filename);
         void setMode(Mode mode);
     };
 } // namespace runner

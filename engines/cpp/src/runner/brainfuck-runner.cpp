@@ -1,5 +1,6 @@
 #include "brainfuck-runner.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <exception>
 #include <fstream>
@@ -58,12 +59,14 @@ namespace runner
         }
     }
 
-    void BrainFuckRunner::runFromFile(std::string &filename)
+    void BrainFuckRunner::runFromFile(const std::string &filename)
     {
         namespace fs = std::filesystem;
         auto file = fs::path(filename);
 
-        if (!((file.extension().string() == ".bf") || (file.extension().string() == ".b")))
+        auto ext = file.extension().string();
+        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        if (!((ext == ".bf") || (ext == ".b")))
         {
             throw std::runtime_error("Invalid file extension!");
         }
