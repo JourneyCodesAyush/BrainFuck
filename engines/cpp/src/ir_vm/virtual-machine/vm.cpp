@@ -43,10 +43,13 @@ namespace vm
             switch (instr.opcode)
             {
             case instruction::OpCode::ADD:
-                this->memory[this->memory_pointer] += instr.argument;
+                memory[memory_pointer] = uint8_t(memory[memory_pointer] + instr.argument);
                 break;
             case instruction::OpCode::MOVE:
-                this->memory_pointer += instr.argument;
+                if (instr.argument >= 0)
+                    memory_pointer = (memory_pointer + instr.argument) % MAX_SIZE;
+                else
+                    memory_pointer = (memory_pointer + MAX_SIZE + instr.argument % MAX_SIZE) % MAX_SIZE;
                 break;
             case instruction::OpCode::INPUT:
                 this->take_input();
@@ -57,11 +60,15 @@ namespace vm
             case instruction::OpCode::JZ:
                 if (this->memory[this->memory_pointer] == 0)
                     this->ip = instr.argument;
+                else
+                    this->advance();
                 break;
 
             case instruction::OpCode::JNZ:
                 if (this->memory[this->memory_pointer] != 0)
                     this->ip = instr.argument;
+                else
+                    this->advance();
                 break;
 
             default:
