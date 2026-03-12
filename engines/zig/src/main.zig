@@ -1,5 +1,5 @@
 const std = @import("std");
-const interpreter = @import("interpreter.zig");
+const interpreter = @import("./char_interpreter/interpreter.zig");
 
 fn print_help() void {
     std.debug.print(" ____            _       _____           _    \n", .{});
