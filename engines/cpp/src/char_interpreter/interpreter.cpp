@@ -24,15 +24,15 @@ namespace interpreter
     {
     }
 
-    void Interpreter::set_source(const std::string &source)
+    void Interpreter::setSource(const std::string &source)
     {
         this->source = source;
-        reset_current_pointer();
-        source_brackets_trace();
-        reset_current_pointer();
+        resetCurrentPointer();
+        sourceBracketsTrace();
+        resetCurrentPointer();
     }
 
-    void Interpreter::source_brackets_trace()
+    void Interpreter::sourceBracketsTrace()
     {
         while (instruction_pointer < source.size())
         {
@@ -82,7 +82,7 @@ namespace interpreter
         // std::cout << "Tracing complete...\n";
     }
 
-    void Interpreter::reset_current_pointer()
+    void Interpreter::resetCurrentPointer()
     {
         instruction_pointer = 0;
     }
@@ -92,7 +92,7 @@ namespace interpreter
         instruction_pointer++;
     }
 
-    void Interpreter::increment_memory_pointer()
+    void Interpreter::incrementMemoryPointer()
     {
         if (memory_pointer == MAX_SIZE - 1)
         {
@@ -104,7 +104,7 @@ namespace interpreter
         }
     }
 
-    void Interpreter::decrement_memory_pointer()
+    void Interpreter::decrementMemoryPointer()
     {
         if (memory_pointer == 0)
         {
@@ -116,23 +116,23 @@ namespace interpreter
         }
     }
 
-    void Interpreter::print_memory_pointer()
+    void Interpreter::printMemoryPointer()
     {
         std::cout << char(memory[memory_pointer]);
         // << "<something>";
     }
 
-    void Interpreter::increment_memory_value()
+    void Interpreter::incrementMemoryValue()
     {
         memory[memory_pointer]++;
     }
 
-    void Interpreter::decrement_memory_value()
+    void Interpreter::decrementMemoryValue()
     {
         memory[memory_pointer]--;
     }
 
-    void Interpreter::take_input()
+    void Interpreter::takeInput()
     {
         std::cout << "> ";
         int ch = input.get();
@@ -161,23 +161,23 @@ namespace interpreter
                 switch (c)
                 {
                 case '>':
-                    increment_memory_pointer();
+                    incrementMemoryPointer();
                     break;
                 case '<':
-                    decrement_memory_pointer();
+                    decrementMemoryPointer();
                     break;
                 case '.':
-                    print_memory_pointer();
+                    printMemoryPointer();
                     break;
                 case ',':
                     // std::cout << "> ";
-                    take_input();
+                    takeInput();
                     break;
                 case '+':
-                    increment_memory_value();
+                    incrementMemoryValue();
                     break;
                 case '-':
-                    decrement_memory_value();
+                    decrementMemoryValue();
                     break;
 
                 case '[':

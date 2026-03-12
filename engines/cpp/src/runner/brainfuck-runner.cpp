@@ -95,7 +95,7 @@ namespace runner
     {
         try
         {
-            this->intrprt.set_source(this->source);
+            this->intrprt.setSource(this->source);
             this->intrprt.interpret();
         }
         catch (const std::exception &e)

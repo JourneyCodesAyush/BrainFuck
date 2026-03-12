@@ -23,23 +23,23 @@ namespace interpreter
         std::stack<int> trace_brackets;
         std::unordered_map<int, int> brackets;
 
-        void source_brackets_trace();
-        void reset_current_pointer();
+        void sourceBracketsTrace();
+        void resetCurrentPointer();
 
         // Helper methods
         void advance();
-        void decrement_memory_pointer();
-        void increment_memory_pointer();
-        void print_memory_pointer();
-        void increment_memory_value();
-        void decrement_memory_value();
-        void take_input();
+        void decrementMemoryPointer();
+        void incrementMemoryPointer();
+        void printMemoryPointer();
+        void incrementMemoryValue();
+        void decrementMemoryValue();
+        void takeInput();
 
     public:
         Interpreter(std::istream &input_stream = std::cin);
         Interpreter(const std::string &source_str, std::istream &input_stream = std::cin);
         void interpret();
-        void set_source(const std::string &source);
+        void setSource(const std::string &source);
         ~Interpreter();
     };
 

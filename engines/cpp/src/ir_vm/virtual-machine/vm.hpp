@@ -18,7 +18,7 @@ namespace vm
         std::uint8_t memory[MAX_SIZE] = {0};
 
         inline void advance();
-        void take_input();
+        void takeInput();
 
     public:
         VirtualMachine(std::istream &input_stream = std::cin) : input(input_stream), instructions({}), ip(0), memory_pointer(MAX_SIZE / 2) {}

@@ -16,7 +16,7 @@ namespace vm
         this->instructions = instructions;
     }
 
-    void VirtualMachine::take_input()
+    void VirtualMachine::takeInput()
     {
         std::cout << "> ";
         int ch = this->input.get();
@@ -53,10 +53,10 @@ namespace vm
                     memory_pointer = (memory_pointer + MAX_SIZE + instr.argument % MAX_SIZE) % MAX_SIZE;
                 break;
             case instruction::OpCode::INPUT:
-                this->take_input();
+                this->takeInput();
                 break;
             case instruction::OpCode::OUTPUT:
-                std::cout << static_cast<char>(this->memory[this->memory_pointer]);
+                std::cout << char(this->memory[this->memory_pointer]);
                 break;
             case instruction::OpCode::JZ:
                 if (this->memory[this->memory_pointer] == 0)
