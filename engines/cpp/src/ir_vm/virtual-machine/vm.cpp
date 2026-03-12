@@ -13,6 +13,7 @@ namespace vm
 
     void VirtualMachine::setInstructions(const std::vector<instruction::Instruction> &instructions)
     {
+        this->ip = 0;
         this->instructions = instructions;
     }
 
@@ -84,5 +85,7 @@ namespace vm
             if (!advanced)
                 this->advance();
         }
+
+        std::cout << "\n";
     }
 } // namespace vm
