@@ -2,6 +2,7 @@
 #include <stack>
 #include <vector>
 
+#include "optimizer.hpp"
 #include "../instruction/opcode.hpp"
 #include "../virtual-machine/vm.hpp"
 
