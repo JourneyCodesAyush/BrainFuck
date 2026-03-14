@@ -32,14 +32,17 @@
 
 ## Overview
 
-This repository contains two minimal **Brainfuck interpreters** written in:
+This repository contains Brainfuck engines written in:
 
 - C++
 - Zig
 
-Both interpreters execute Brainfuck code directly from a `.bf` source file and are designed for learning, experimentation purposes.
+The implementations explore different execution strategies for running Brainfuck programs.
 
-> Lightweight, single-file interpreters with clear memory model and basic error handling.
+- The **C++ engine** supports multiple execution modes consisting of a character interpreter and an IR-based virtual machine.
+- The **Zig engine** is a minimal direct interpreter.
+
+The project is designed for learning and experimentation with interpreter design, intermediate representations, and virtual machine runtimes.
 
 ---
 
@@ -47,15 +50,28 @@ Both interpreters execute Brainfuck code directly from a `.bf` source file and a
 
 ### C++
 
-- Uses a **fixed-size memory tape**
+The C++ implementation provides a **multi-engine Brainfuck runtime**.
+
+Features:
+
+- Fixed-size memory tape (`32768` cells)
 - Supports all 8 Brainfuck instructions
-- Checks for **unmatched brackets** and **pointer underflow**
-- Input/output via terminal
+- Detects **unmatched brackets**
+- Prevents **pointer underflow**
+- Runtime engine selection
+- Optional REPL mode
+- IR instruction collapsing optimization
+
+Execution engines:
+
+- **Character Interpreter** — executes Brainfuck instructions directly
+- **IR + Virtual Machine** — compiles Brainfuck into an intermediate representation before execution
 
 ### Zig
 
 - Builds with `zig build` and produces `brainfuck` executable
-- Minimalistic design, same behavior as C++ engine
+- Minimalistic direct Brainfuck interpreter
+- Simple implementation designed for learning purposes
 
 ---
 
@@ -88,6 +104,13 @@ All engines run by passing a `.bf` file as a command-line argument. Example:
 ./zig-out/bin/brainfuck program.bf
 ```
 
+The C++ engine also supports selecting the execution mode:
+
+```bash
+./brainfuck program.bf --mode=char
+./brainfuck program.bf --mode=ir
+```
+
 ---
 
 ## Examples
@@ -118,17 +141,20 @@ Type a character, and it will be printed back.
 
 - Runs Brainfuck `.b` or `.bf` programs
 - Supports `>, <, +, -, ., ,, [, ]`
-- Checks for unmatched brackets
-- Prevents pointer underflow (C++ & Zig)
-- Fixed-size memory model (C++ & Zig)
-- Simple educational codebase
+- Multiple execution engines (C++)
+- IR-based virtual machine (C++)
+- Instruction collapsing optimizations (C++)
+- Fixed-size memory model
+- Bracket validation
+- Pointer safety checks
+- Optional REPL mode in both Zig and C++
 
 ---
 
 ## Known Limitations
 
 - No memory expansion (C++ & Zig)
-- No optimization of repeated instructions
+- Only basic IR optimizations implemented
 - No debugging mode or step execution
 - Input is character-based only
 - Console encoding may vary by platform
@@ -147,6 +173,8 @@ brainfuck
 │       ├── src/          # Zig interpreter sources
 │       ├── build.zig
 │       └── build.zig.zon
+│
+├── examples/
 │
 ├── LICENSE
 └── README.md
