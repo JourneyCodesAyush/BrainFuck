@@ -12,16 +12,16 @@ pub const Parser = struct {
     allocator: *std.mem.Allocator,
 
     pub fn init(self: *Parser, source: []const u8, allocator: *std.mem.Allocator) !void {
-        std.debug.print("Initializing the parser...\n", .{});
+        // std.debug.print("Initializing the parser...\n", .{});
         self.source = source;
         self.allocator = allocator;
-
+        self.current = 0;
         self.array = try std.ArrayList(instruction.Instructions).initCapacity(self.allocator.*, 1024);
         self.loop_stack = try std.ArrayList(usize).initCapacity(self.allocator.*, 256);
     }
 
     pub fn deinit(self: *Parser) void {
-        std.debug.print("Deinitializing the parser...\n", .{});
+        // std.debug.print("Deinitializing the parser...\n", .{});
         self.array.deinit(self.allocator.*);
         self.loop_stack.deinit(self.allocator.*);
     }
@@ -31,8 +31,8 @@ pub const Parser = struct {
         self.current = 0;
     }
 
-    pub fn parse(self: *Parser) errors.Errors!std.ArrayList(instruction.Instructions) {
-        std.debug.print("Parsing the raw code to IR...\n", .{});
+    pub fn parse(self: *Parser) errors.Errors![]instruction.Instructions {
+        // std.debug.print("Parsing the raw code to IR...\n", .{});
         while (self.current < self.source.len) {
             switch (self.source[self.current]) {
                 '+' => {
@@ -67,7 +67,7 @@ pub const Parser = struct {
             self.advance();
         }
 
-        return self.array;
+        return self.array.items;
     }
 
     fn emitByte(opcode: instruction.OpCode, argument: i32) instruction.Instructions {
