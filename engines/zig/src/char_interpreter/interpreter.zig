@@ -1,8 +1,6 @@
 const std = @import("std");
-
+const errors = @import("../errors/error.zig");
 const max_size: usize = 32_768;
-
-pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory, IOError };
 
 pub const Interpreter = struct {
     memory: [max_size]u8,
@@ -14,7 +12,7 @@ pub const Interpreter = struct {
     trace_brackets: std.ArrayList(usize),
 
     allocator: *std.mem.Allocator,
-    pub fn init(self: *Interpreter, source_code: []const u8, allocator: *std.mem.Allocator) Errors!void {
+    pub fn init(self: *Interpreter, source_code: []const u8, allocator: *std.mem.Allocator) errors.Errors!void {
         self.memory_pointer = max_size / 2;
         self.instruction_pointer = 0;
         self.source = source_code;
@@ -57,14 +55,14 @@ pub const Interpreter = struct {
         self.instruction_pointer = 0;
     }
 
-    fn takeInput(self: *Interpreter) Errors!void {
+    fn takeInput(self: *Interpreter) errors.Errors!void {
         var buf: [1]u8 = undefined;
         var stdin = std.fs.File.stdin();
 
         std.debug.print("> ", .{});
-        const n = stdin.read(&buf) catch return Errors.IOError;
+        const n = stdin.read(&buf) catch return errors.Errors.IOError;
 
-        if (n == 0) return Errors.IOError;
+        if (n == 0) return errors.Errors.IOError;
 
         self.memory[self.memory_pointer] = buf[0];
 
@@ -85,14 +83,14 @@ pub const Interpreter = struct {
         }
     }
 
-    fn sourceBracketsTrace(self: *Interpreter) Errors!void {
+    fn sourceBracketsTrace(self: *Interpreter) errors.Errors!void {
         self.instruction_pointer = 0;
         while (self.instruction_pointer < self.source.len) : (self.instruction_pointer += 1) {
             const c = self.source[self.instruction_pointer];
             switch (c) {
                 '[' => try self.trace_brackets.append(self.allocator.*, self.instruction_pointer),
                 ']' => {
-                    const popped = self.trace_brackets.pop() orelse return Errors.UnbalancedClosingBracket;
+                    const popped = self.trace_brackets.pop() orelse return errors.Errors.UnbalancedClosingBracket;
                     try self.brackets.put(popped, self.instruction_pointer);
                     try self.brackets.put(self.instruction_pointer, popped);
                 },
@@ -101,14 +99,14 @@ pub const Interpreter = struct {
         }
 
         if (self.trace_brackets.items.len != 0)
-            return Errors.UnbalancedOpeningBracket;
+            return errors.Errors.UnbalancedOpeningBracket;
     }
 
     fn advance(self: *Interpreter) void {
         self.instruction_pointer += 1;
     }
 
-    pub fn setSource(self: *Interpreter, source_code: []const u8) Errors!void {
+    pub fn setSource(self: *Interpreter, source_code: []const u8) errors.Errors!void {
         self.source = source_code;
 
         self.brackets.clearRetainingCapacity();
@@ -120,7 +118,7 @@ pub const Interpreter = struct {
         self.resetInstructionPointer();
     }
 
-    pub fn interpret(self: *Interpreter) Errors!void {
+    pub fn interpret(self: *Interpreter) errors.Errors!void {
         while (self.instruction_pointer < self.source.len) {
             const instruction = self.source[self.instruction_pointer];
 
@@ -137,13 +135,13 @@ pub const Interpreter = struct {
                 },
                 '[' => {
                     if (self.memory[self.memory_pointer] == 0) {
-                        const jump_to = self.brackets.get(self.instruction_pointer) orelse return Errors.UnbalancedOpeningBracket;
+                        const jump_to = self.brackets.get(self.instruction_pointer) orelse return errors.Errors.UnbalancedOpeningBracket;
                         self.instruction_pointer = jump_to;
                     }
                 },
                 ']' => {
                     if (self.memory[self.memory_pointer] != 0) {
-                        const jump_to = self.brackets.get(self.instruction_pointer) orelse return Errors.UnbalancedClosingBracket;
+                        const jump_to = self.brackets.get(self.instruction_pointer) orelse return errors.Errors.UnbalancedClosingBracket;
                         self.instruction_pointer = jump_to;
                     }
                 },
