@@ -70,7 +70,7 @@ pub const VirtualMachine: type = struct {
                 instruction.OpCode.ADD => {
                     const idx = self.memory_pointer;
                     const cell: i32 = @as(i32, self.memory[idx]) + instr.argument;
-                    self.memory[idx] = @intCast(cell);
+                    self.memory[idx] = @intCast(cell & 0xFF);
                 },
                 instruction.OpCode.MOVE => {
                     const mp: isize = @intCast(self.memory_pointer);
