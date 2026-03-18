@@ -11,20 +11,20 @@ pub const Interpreter = struct {
     brackets: std.AutoHashMap(usize, usize),
     trace_brackets: std.ArrayList(usize),
 
-    allocator: *std.mem.Allocator,
-    pub fn init(self: *Interpreter, source_code: []const u8, allocator: *std.mem.Allocator) errors.Errors!void {
+    allocator: std.mem.Allocator,
+    pub fn init(self: *Interpreter, source_code: []const u8, allocator: std.mem.Allocator) errors.Errors!void {
         self.memory_pointer = max_size / 2;
         self.instruction_pointer = 0;
         self.source = source_code;
         self.allocator = allocator;
         @memset(&self.memory, 0);
 
-        self.brackets = std.AutoHashMap(usize, usize).init(allocator.*);
-        self.trace_brackets = try std.ArrayList(usize).initCapacity(allocator.*, 32);
+        self.brackets = std.AutoHashMap(usize, usize).init(allocator);
+        self.trace_brackets = try std.ArrayList(usize).initCapacity(allocator, 32);
     }
 
     pub fn deinit(self: *Interpreter) void {
-        self.trace_brackets.deinit(self.allocator.*);
+        self.trace_brackets.deinit(self.allocator);
         // self.allocator.free(self.brackets);
         self.brackets.deinit();
     }
@@ -88,7 +88,7 @@ pub const Interpreter = struct {
         while (self.instruction_pointer < self.source.len) : (self.instruction_pointer += 1) {
             const c = self.source[self.instruction_pointer];
             switch (c) {
-                '[' => try self.trace_brackets.append(self.allocator.*, self.instruction_pointer),
+                '[' => try self.trace_brackets.append(self.allocator, self.instruction_pointer),
                 ']' => {
                     const popped = self.trace_brackets.pop() orelse return errors.Errors.UnbalancedClosingBracket;
                     try self.brackets.put(popped, self.instruction_pointer);
