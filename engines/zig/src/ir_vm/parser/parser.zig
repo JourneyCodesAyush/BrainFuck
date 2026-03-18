@@ -33,6 +33,7 @@ pub const Parser = struct {
 
     pub fn parse(self: *Parser) errors.Errors![]instruction.Instructions {
         // std.debug.print("Parsing the raw code to IR...\n", .{});
+        self.resetState();
         while (self.current < self.source.len) {
             switch (self.source[self.current]) {
                 '+' => {
@@ -76,5 +77,11 @@ pub const Parser = struct {
 
     fn advance(self: *Parser) void {
         self.current += 1;
+    }
+
+    fn resetState(self: *Parser) void {
+        self.array.clearRetainingCapacity();
+        self.loop_stack.clearRetainingCapacity();
+        self.current = 0;
     }
 };
