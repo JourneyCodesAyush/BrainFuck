@@ -3,6 +3,7 @@ const instruction = @import("../ir_vm/instructions/opcode.zig");
 const intrpreter = @import("../char_interpreter/interpreter.zig");
 const parser = @import("../ir_vm/parser/parser.zig");
 const vm = @import("../ir_vm/virtual-machine/vm.zig");
+const optimizer = @import("../ir_vm/optimization/optimizer.zig");
 
 const errors = @import("../errors/error.zig");
 
@@ -15,6 +16,7 @@ pub const Runner = struct {
     prs: parser.Parser = undefined,
     vir_mac: vm.VirtualMachine = undefined,
     intrprt: intrpreter.Interpreter = undefined,
+    optimize: optimizer.Optimizer = undefined,
 
     pub fn init(self: *Runner, allocator: std.mem.Allocator) errors.Errors!void {
         self.allocator = allocator;
@@ -22,13 +24,14 @@ pub const Runner = struct {
 
         try self.intrprt.init("", self.allocator);
         try self.prs.init("", self.allocator);
+        try self.optimize.init(self.allocator);
         self.vir_mac.init();
     }
 
     pub fn deinit(self: *Runner) void {
         self.intrprt.deinit();
         self.prs.deinit();
-
+        self.optimize.deinit();
         if (self.source.len > 0) {
             self.allocator.free(self.source);
             self.source = &[_]u8{};
@@ -154,8 +157,10 @@ pub const Runner = struct {
     fn runByteCodeVirtualMachine(self: *Runner) errors.Errors!void {
         self.prs.setSource(self.source);
         const instr: []instruction.Instructions = try self.prs.parse();
-
-        self.vir_mac.setInstructions(instr);
+        self.optimize.setRaw(instr);
+        const optimized = try self.optimize.optimize();
+        // self.vir_mac.setInstructions(instr);
+        self.vir_mac.setInstructions(optimized);
         try self.vir_mac.run();
     }
 };
