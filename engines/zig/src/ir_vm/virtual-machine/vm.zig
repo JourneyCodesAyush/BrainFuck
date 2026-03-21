@@ -2,7 +2,7 @@ const std: type = @import("std");
 const instruction: type = @import("../instructions/opcode.zig");
 const errors = @import("../../errors/error.zig");
 
-const max_size: usize = 32_768;
+pub const max_size: usize = 32_768;
 
 pub const VirtualMachine: type = struct {
     instructions: []instruction.Instructions,
