@@ -21,6 +21,9 @@
   - [Examples](#examples)
     - [Hello World](#hello-world)
     - [Echo Input](#echo-input)
+    - [Test Environment](#test-environment)
+    - [Build Configuration](#build-configuration)
+  - [Benchmark](#benchmark)
   - [Features](#features)
   - [Known Limitations](#known-limitations)
   - [Project Structure](#project-structure)
@@ -134,6 +137,36 @@ Hello World!
 ```
 
 Type a character, and it will be printed back.
+
+---
+
+### Test Environment
+
+- **CPU**: Intel(R) Core(TM) i5 M 460 @ 2.53GHz
+- **Cores / Threads**: 2 cores / 4 threads
+- **RAM**: 4 GB
+- **System**: Dell Inspiron N5010
+- **OS**: Windows 10 Home (Build 19045, x64)
+
+### Build Configuration
+
+- **Zig**: ReleaseFast
+- **C++**: -O3
+
+---
+
+## Benchmark
+
+For [Mandel Brot code](./examples/mandel.b)
+
+| Run         | C++ Interpreter (ms) | Zig Interpreter (ms) | C++ VM (ms) | Zig VM (ms) |
+| ----------- | -------------------- | -------------------- | ----------- | ----------- |
+| 1           | 994222               | 90883                | 50028       | 43827       |
+| 2           | 101755               | 92457                | 42753       | 37110       |
+| 3           | 100700               | 91428                | 36374       | 38758       |
+| 4           | 112873               | 92705                | 33157       | 39720       |
+| 5           | 106427               | 92208                | 31967       | 29985       |
+| **Average** | **104235**           | **91936.2**          | **388559**  | **37880**   |
 
 ---
 
