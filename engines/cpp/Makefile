@@ -1,6 +1,16 @@
 # Compiler and flags
-CC = g++ 
+CC = g++
 CFLAGS = -Wall -g -std=c++17
+
+RELEASE_FLAGS = -O3
+
+# Default build = debug
+BUILD_FLAGS = $(CFLAGS)
+
+# If RELEASE=1 → use optimized flags
+ifeq ($(RELEASE),1)
+    BUILD_FLAGS = -Wall -std=c++17 $(RELEASE_FLAGS)
+endif
 
 # Source and header directories
 SRC_DIR = src
@@ -30,12 +40,12 @@ $(shell $(MKDIR))
 
 # Build executable
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -I $(INC_DIR) -o $(TARGET) $(OBJ)
+	$(CC) $(BUILD_FLAGS) -I $(INC_DIR) -o $(TARGET) $(OBJ)
 
 # Compile each source file into makeBuild/*.o automatically
 define make_compile_rule
 $(BUILD_DIR)/$(notdir $(1:.cpp=.o)): $(1)
-	$(CC) $(CFLAGS) -I $(INC_DIR) -c $(1) -o $$@
+	$(CC) $(BUILD_FLAGS) -I $(INC_DIR) -c $(1) -o $$@
 endef
 
 # Generate rules for all sources
