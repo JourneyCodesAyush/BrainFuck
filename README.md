@@ -29,7 +29,7 @@
   - [Project Structure](#project-structure)
   - [Contributing](#contributing)
   - [License](#license)
-  - [📬 Author](#-author)
+  - [Author](#author)
 
 ---
 
@@ -72,9 +72,20 @@ Execution engines:
 
 ### Zig
 
-- Builds with `zig build` and produces `brainfuck` executable
-- Minimalistic direct Brainfuck interpreter
-- Simple implementation designed for learning purposes
+The Zig implementation provides a **multi-engine Brainfuck runtime**.
+
+Features:
+
+- Fixed-size memory model
+- Supports all standard Brainfuck instructions
+- Direct interpreter execution
+- IR-based virtual machine execution
+- Builds with `zig build`
+
+Execution engines:
+
+- **Direct Interpreter** — executes Brainfuck instructions directly
+- **IR + Virtual Machine** — compiles Brainfuck into an intermediate representation before execution
 
 ---
 
@@ -227,6 +238,6 @@ Contributing guidelines will be added soon.
 
 ---
 
-## 📬 Author
+## Author
 
 Made with ❤️ by [JourneyCodesAyush](https://github.com/JourneyCodesAyush)
