@@ -68,6 +68,9 @@ pub const Parser = struct {
             self.advance();
         }
 
+        if (self.loop_stack.items.len != 0)
+            return errors.Errors.ParseError;
+
         return self.array.items;
     }
 
