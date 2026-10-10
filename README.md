@@ -1,7 +1,7 @@
 # Brainfuck
 
 ![C++](https://img.shields.io/badge/C%2B%2B-17-orange)
-![Zig](https://img.shields.io/badge/Zig-v0.15.2-yellow)
+![Zig](https://img.shields.io/badge/Zig-v0.17.0-f7a41d)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
