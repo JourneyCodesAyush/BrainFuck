@@ -4,7 +4,7 @@
 #include <string>
 #include <stack>
 #include <vector>
-#include "../instruction/opcode.hpp"
+#include "../instruction/OpCode.hpp"
 
 namespace parser
 {

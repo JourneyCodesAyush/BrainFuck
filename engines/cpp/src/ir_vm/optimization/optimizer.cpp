@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "optimizer.hpp"
-#include "../instruction/opcode.hpp"
+#include "../instruction/OpCode.hpp"
 #include "../virtual-machine/vm.hpp"
 
 std::vector<instruction::Instruction> optimize(const std::vector<instruction::Instruction> &raw)

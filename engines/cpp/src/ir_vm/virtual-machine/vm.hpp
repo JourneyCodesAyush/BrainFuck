@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <iostream>
-#include "../instruction/opcode.hpp"
+#include "../instruction/OpCode.hpp"
 
 #define MAX_SIZE 32768
 
