@@ -19,7 +19,7 @@ namespace vm
 
     void VirtualMachine::takeInput()
     {
-        std::cout << "> ";
+        // std::cout << "> ";
         int ch = this->input.get();
         if (ch == EOF)
         {
@@ -31,8 +31,8 @@ namespace vm
                 ch = 10;
             this->memory[this->memory_pointer] = static_cast<uint8_t>(ch);
         }
-        std::string temp;
-        std::getline(this->input, temp);
+        // std::string temp;
+        // std::getline(this->input, temp);
     }
 
     void VirtualMachine::run()
@@ -86,6 +86,6 @@ namespace vm
                 this->advance();
         }
 
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 } // namespace vm

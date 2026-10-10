@@ -134,7 +134,7 @@ namespace interpreter
 
     void Interpreter::takeInput()
     {
-        std::cout << "> ";
+        // std::cout << "> ";
         int ch = input.get();
         if (ch == EOF)
         {
@@ -146,8 +146,8 @@ namespace interpreter
                 ch = 10;
             memory[memory_pointer] = static_cast<uint8_t>(ch);
         }
-        std::string temp;
-        std::getline(input, temp);
+        // std::string temp;
+        // std::getline(input, temp);
     }
 
     void Interpreter::interpret()
@@ -199,7 +199,7 @@ namespace interpreter
         {
             std::cerr << e.what() << '\n';
         }
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 
 }
