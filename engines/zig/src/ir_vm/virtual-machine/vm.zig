@@ -5,13 +5,15 @@ const errors = @import("../../errors/error.zig");
 pub const max_size: usize = 32_768;
 
 pub const VirtualMachine: type = struct {
+    io: std.Io,
     instructions: []instruction.Instructions,
     memory: [max_size]u8,
     ip: usize,
     memory_pointer: usize,
 
-    pub fn init(self: *VirtualMachine) void {
+    pub fn init(self: *VirtualMachine, io: std.Io) void {
         // std.debug.print("Initialize the VM...\n", .{});
+        self.io = io;
         self.ip = 0;
         self.memory_pointer = 0;
 
@@ -31,29 +33,23 @@ pub const VirtualMachine: type = struct {
 
     fn takeInput(self: *VirtualMachine) errors.Errors!void {
         var buf: [1]u8 = undefined;
-        var stdin = std.fs.File.stdin();
-
+        const stdin = std.Io.File.stdin();
         std.debug.print("> ", .{});
-        const n = stdin.read(&buf) catch return errors.Errors.IOError;
 
+        var rdr = stdin.reader(self.io, &buf);
+        const n = rdr.interface.readSliceShort(&buf) catch return errors.Errors.IOError;
         if (n == 0) return errors.Errors.IOError;
-
         self.memory[self.memory_pointer] = buf[0];
 
-        // Clear any remaining input from this line
+        // flush remainder of line
         var tmp: [1024]u8 = undefined;
+        var tmp_rdr = stdin.reader(self.io, &tmp);
         while (true) {
-            const r = stdin.read(&tmp) catch break;
+            const r = tmp_rdr.interface.readSliceShort(&tmp) catch break;
             if (r == 0) break;
-            // Check if the read chunk contains a newline
-            var found: bool = false;
             for (tmp[0..r]) |b| {
-                if (b == 10 or b == 13) {
-                    found = true;
-                    break;
-                }
+                if (b == '\n' or b == '\r') return;
             }
-            if (found) break;
         }
     }
 

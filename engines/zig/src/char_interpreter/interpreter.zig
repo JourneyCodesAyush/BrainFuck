@@ -11,11 +11,13 @@ pub const Interpreter = struct {
     brackets: std.AutoHashMap(usize, usize),
     trace_brackets: std.ArrayList(usize),
 
+    io: std.Io,
     allocator: std.mem.Allocator,
-    pub fn init(self: *Interpreter, source_code: []const u8, allocator: std.mem.Allocator) errors.Errors!void {
+    pub fn init(self: *Interpreter, source_code: []const u8, io: std.Io, allocator: std.mem.Allocator) errors.Errors!void {
         self.memory_pointer = max_size / 2;
         self.instruction_pointer = 0;
         self.source = source_code;
+        self.io = io;
         self.allocator = allocator;
         @memset(&self.memory, 0);
 
@@ -57,29 +59,23 @@ pub const Interpreter = struct {
 
     fn takeInput(self: *Interpreter) errors.Errors!void {
         var buf: [1]u8 = undefined;
-        var stdin = std.fs.File.stdin();
-
+        const stdin = std.Io.File.stdin();
         std.debug.print("> ", .{});
-        const n = stdin.read(&buf) catch return errors.Errors.IOError;
 
+        var rdr = stdin.reader(self.io, &buf);
+        const n = rdr.interface.readSliceShort(&buf) catch return errors.Errors.IOError;
         if (n == 0) return errors.Errors.IOError;
-
         self.memory[self.memory_pointer] = buf[0];
 
-        // Clear any remaining input from this line
+        // flush remainder of line
         var tmp: [1024]u8 = undefined;
+        var tmp_rdr = stdin.reader(self.io, &tmp);
         while (true) {
-            const r = stdin.read(&tmp) catch break;
+            const r = tmp_rdr.interface.readSliceShort(&tmp) catch break;
             if (r == 0) break;
-            // Check if the read chunk contains a newline
-            var found: bool = false;
             for (tmp[0..r]) |b| {
-                if (b == 10 or b == 13) {
-                    found = true;
-                    break;
-                }
+                if (b == '\n' or b == '\r') return;
             }
-            if (found) break;
         }
     }
 

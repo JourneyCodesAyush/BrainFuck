@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const Io = std.Io;
+
 const errors = @import("./errors/error.zig");
 
 const runner = @import("./runner/runner.zig");
@@ -14,16 +16,16 @@ fn handleError(err: errors.Errors) void {
     }
 }
 
-pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
+pub fn main(init: std.process.Init) !void {
+    const allocator = init.arena.allocator();
 
     var mode: runner.Mode = runner.Mode.CHAR;
     var filename: []const u8 = "";
 
-    const args = try std.process.argsAlloc(allocator);
-    defer std.process.argsFree(allocator, args);
+    const args = init.minimal.args.toSlice(allocator) catch {
+        handleError(errors.Errors.IOError);
+        return errors.Errors.IOError;
+    };
 
     var i: usize = 1;
 
@@ -48,7 +50,7 @@ pub fn main() !void {
     }
 
     var rnr: runner.Runner = undefined;
-    try rnr.init(allocator);
+    try rnr.init(init.io, allocator);
 
     rnr.setMode(mode);
     if (filename.len != 0) {

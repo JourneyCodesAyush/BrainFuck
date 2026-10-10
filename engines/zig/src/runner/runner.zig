@@ -12,20 +12,22 @@ pub const Mode = enum { CHAR, IR };
 pub const Runner = struct {
     mode: Mode,
     source: []u8,
+    io: std.Io,
     allocator: std.mem.Allocator,
     prs: parser.Parser = undefined,
     vir_mac: vm.VirtualMachine = undefined,
     intrprt: intrpreter.Interpreter = undefined,
     optimize: optimizer.Optimizer = undefined,
 
-    pub fn init(self: *Runner, allocator: std.mem.Allocator) errors.Errors!void {
+    pub fn init(self: *Runner, io: std.Io, allocator: std.mem.Allocator) errors.Errors!void {
+        self.io = io;
         self.allocator = allocator;
         self.source = &[_]u8{};
 
-        try self.intrprt.init("", self.allocator);
+        try self.intrprt.init("", self.io, self.allocator);
         try self.prs.init("", self.allocator);
         try self.optimize.init(self.allocator);
-        self.vir_mac.init();
+        self.vir_mac.init(self.io);
     }
 
     pub fn deinit(self: *Runner) void {
@@ -45,13 +47,14 @@ pub const Runner = struct {
     pub fn runRepl(self: *Runner) errors.Errors!void {
         printReplHelp();
 
-        const stdin = std.fs.File.stdin();
+        const stdin = std.Io.File.stdin();
         var buf: [1024]u8 = undefined;
 
         while (true) {
             std.debug.print("$ ", .{});
 
-            const len = stdin.read(&buf) catch {
+            var rdr = stdin.reader(self.io, &buf);
+            const len = rdr.interface.readSliceShort(&buf) catch {
                 return errors.Errors.IOError;
             };
 
@@ -96,14 +99,20 @@ pub const Runner = struct {
             return;
         }
 
-        // Read entire file
-        const source = std.fs.cwd().readFileAlloc(
-            self.allocator,
-            filename,
-            10 * 1024 * 1024,
-        ) catch {
+        const o_file = std.Io.Dir.cwd().openFile(self.io, filename, .{ .mode = .read_only }) catch {
             return errors.Errors.IOError;
         };
+        defer o_file.close(self.io);
+
+        var buf: [4096]u8 = undefined;
+        var file_reader = o_file.reader(self.io, &buf);
+
+        var accumulator: std.Io.Writer.Allocating = .init(self.allocator);
+        errdefer accumulator.deinit();
+
+        _ = file_reader.interface.streamRemaining(&accumulator.writer) catch return errors.Errors.IOError;
+
+        const source = accumulator.toOwnedSlice() catch return errors.Errors.OutOfMemory;
 
         self.setSourceOwned(source);
 
