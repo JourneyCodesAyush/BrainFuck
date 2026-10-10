@@ -111,9 +111,7 @@ pub fn build(b: *std.Build) void {
 
     // This allows the user to pass arguments to the application in the build
     // command itself, like this: `zig build run -- arg1 arg2 etc`
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    run_cmd.addPassthruArgs();
 
     // Creates an executable that will run `test` blocks from the provided module.
     // Here `mod` needs to define a target, which is why earlier we made sure to
@@ -142,17 +140,17 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_mod_tests.step);
     test_step.dependOn(&run_exe_tests.step);
 
-    const clean_step = b.step("clean", "Clean build artifacts");
+    // const clean_step = b.step("clean", "Clean build artifacts");
 
-    clean_step.makeFn = struct {
-        fn run(_: *std.Build.Step, _: std.Build.Step.MakeOptions) !void {
-            var cwd = std.fs.cwd();
-            std.debug.print("Cleaning build artifacts...\n", .{});
-            cwd.deleteTree(".zig-cache") catch {};
-            cwd.deleteTree("zig-out") catch {};
-            std.debug.print("Done!\n", .{});
-        }
-    }.run;
+    // clean_step.makeFn = struct {
+    //     fn run(_: *std.Build.Step, _: std.Build.Step.MakeOptions) !void {
+    //         var cwd = std.Io.Dir.cwd();
+    //         std.debug.print("Cleaning build artifacts...\n", .{});
+    //         cwd.deleteTree(".zig-cache") catch {};
+    //         cwd.deleteTree("zig-out") catch {};
+    //         std.debug.print("Done!\n", .{});
+    //     }
+    // }.run;
 
     // Just like flags, top level steps are also listed in the `--help` menu.
     //
