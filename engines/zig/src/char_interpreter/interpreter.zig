@@ -15,7 +15,7 @@ pub const Interpreter = struct {
     writer: *std.Io.Writer,
     allocator: std.mem.Allocator,
     pub fn init(self: *Interpreter, source_code: []const u8, io: std.Io, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
-        self.memory_pointer = max_size / 2;
+        self.memory_pointer = 0;
         self.instruction_pointer = 0;
         self.source = source_code;
         self.io = io;
