@@ -13,6 +13,7 @@ fn handleError(err: errors.Errors) void {
         errors.Errors.ParseError => std.debug.print("ParseError", .{}),
         errors.Errors.UnbalancedClosingBracket => std.debug.print("UnbalancedClosingBracket", .{}),
         errors.Errors.UnbalancedOpeningBracket => std.debug.print("UnbalancedOpeningBracket", .{}),
+        errors.Errors.WriteFailedError => std.debug.print("WriteFailedError", .{}),
     }
 }
 
@@ -21,6 +22,15 @@ pub fn main(init: std.process.Init) !void {
 
     var mode: runner.Mode = runner.Mode.CHAR;
     var filename: []const u8 = "";
+
+    // Buffered writer over stdout — flushed once on return via `defer`.
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_file_writer: Io.File.Writer = .init(.stdout(), init.io, &stdout_buffer);
+    const stdout_writer = &stdout_file_writer.interface;
+    defer stdout_writer.flush() catch {};
+
+    // const args = try std.process.argsAlloc(allocator);
+    // defer std.process.argsFree(allocator, args);
 
     const args = init.minimal.args.toSlice(allocator) catch {
         handleError(errors.Errors.IOError);
@@ -50,7 +60,7 @@ pub fn main(init: std.process.Init) !void {
     }
 
     var rnr: runner.Runner = undefined;
-    try rnr.init(init.io, allocator);
+    try rnr.init(init.io, stdout_writer, allocator);
 
     rnr.setMode(mode);
     if (filename.len != 0) {

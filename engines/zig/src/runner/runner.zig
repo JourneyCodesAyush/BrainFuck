@@ -14,20 +14,22 @@ pub const Runner = struct {
     source: []u8,
     io: std.Io,
     allocator: std.mem.Allocator,
+    writer: *std.Io.Writer,
     prs: parser.Parser = undefined,
     vir_mac: vm.VirtualMachine = undefined,
     intrprt: intrpreter.Interpreter = undefined,
     optimize: optimizer.Optimizer = undefined,
 
-    pub fn init(self: *Runner, io: std.Io, allocator: std.mem.Allocator) errors.Errors!void {
+    pub fn init(self: *Runner, io: std.Io, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
         self.io = io;
+        self.writer = writer;
         self.allocator = allocator;
         self.source = &[_]u8{};
 
-        try self.intrprt.init("", self.io, self.allocator);
+        try self.intrprt.init("", self.io, self.writer, self.allocator);
         try self.prs.init("", self.allocator);
         try self.optimize.init(self.allocator);
-        self.vir_mac.init(self.io);
+        self.vir_mac.init(self.io, self.writer);
     }
 
     pub fn deinit(self: *Runner) void {
@@ -51,7 +53,7 @@ pub const Runner = struct {
         var buf: [1024]u8 = undefined;
 
         while (true) {
-            std.debug.print("$ ", .{});
+            // std.debug.print("$ ", .{});
 
             var rdr = stdin.reader(self.io, &buf);
             const len = rdr.interface.readSliceShort(&buf) catch {
@@ -106,15 +108,21 @@ pub const Runner = struct {
 
         var buf: [4096]u8 = undefined;
         var file_reader = o_file.reader(self.io, &buf);
-
         var accumulator: std.Io.Writer.Allocating = .init(self.allocator);
         errdefer accumulator.deinit();
-
         _ = file_reader.interface.streamRemaining(&accumulator.writer) catch return errors.Errors.IOError;
-
         const source = accumulator.toOwnedSlice() catch return errors.Errors.OutOfMemory;
-
         self.setSourceOwned(source);
+
+        // const source = std.fs.cwd().readFileAlloc(
+        //     self.allocator,
+        //     filename,
+        //     10 * 1024 * 1024,
+        // ) catch {
+        //     return errors.Errors.IOError;
+        // };
+
+        // self.setSourceOwned(source);
 
         switch (self.mode) {
             Mode.CHAR => {
@@ -155,6 +163,7 @@ pub const Runner = struct {
             errors.Errors.ParseError => std.debug.print("ParseError", .{}),
             errors.Errors.UnbalancedClosingBracket => std.debug.print("UnbalancedClosingBracket", .{}),
             errors.Errors.UnbalancedOpeningBracket => std.debug.print("UnbalancedOpeningBracket", .{}),
+            errors.Errors.WriteFailedError => std.debug.print("WriteFailed", .{}),
         }
     }
 

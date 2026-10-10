@@ -12,12 +12,14 @@ pub const Interpreter = struct {
     trace_brackets: std.ArrayList(usize),
 
     io: std.Io,
+    writer: *std.Io.Writer,
     allocator: std.mem.Allocator,
-    pub fn init(self: *Interpreter, source_code: []const u8, io: std.Io, allocator: std.mem.Allocator) errors.Errors!void {
+    pub fn init(self: *Interpreter, source_code: []const u8, io: std.Io, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
         self.memory_pointer = max_size / 2;
         self.instruction_pointer = 0;
         self.source = source_code;
         self.io = io;
+        self.writer = writer;
         self.allocator = allocator;
         @memset(&self.memory, 0);
 
@@ -60,23 +62,13 @@ pub const Interpreter = struct {
     fn takeInput(self: *Interpreter) errors.Errors!void {
         var buf: [1]u8 = undefined;
         const stdin = std.Io.File.stdin();
-        std.debug.print("> ", .{});
+        // std.debug.print("> ", .{});
+        // self.writer.print("> ", .{}) catch return errors.Errors.WriteFailedError;
 
         var rdr = stdin.reader(self.io, &buf);
         const n = rdr.interface.readSliceShort(&buf) catch return errors.Errors.IOError;
         if (n == 0) return errors.Errors.IOError;
         self.memory[self.memory_pointer] = buf[0];
-
-        // flush remainder of line
-        var tmp: [1024]u8 = undefined;
-        var tmp_rdr = stdin.reader(self.io, &tmp);
-        while (true) {
-            const r = tmp_rdr.interface.readSliceShort(&tmp) catch break;
-            if (r == 0) break;
-            for (tmp[0..r]) |b| {
-                if (b == '\n' or b == '\r') return;
-            }
-        }
     }
 
     fn sourceBracketsTrace(self: *Interpreter) errors.Errors!void {
@@ -123,9 +115,12 @@ pub const Interpreter = struct {
                 '<' => self.decrementMemoryPointer(),
                 '+' => self.incrementMemoryValue(),
                 '-' => self.decrementMemoryValue(),
-                '.' => std.debug.print("{c}", .{
-                    self.memory[self.memory_pointer],
-                }),
+                '.' => {
+                    // std.debug.print("{c}", .{
+                    //     self.memory[self.memory_pointer],
+                    // });
+                    self.writer.print("{c}", .{self.memory[self.memory_pointer]}) catch return errors.Errors.WriteFailedError;
+                },
                 ',' => {
                     try self.takeInput();
                 },

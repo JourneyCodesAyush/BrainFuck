@@ -1,1 +1,1 @@
-pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory, IOError, ParseError };
+pub const Errors = error{ UnbalancedOpeningBracket, UnbalancedClosingBracket, OutOfMemory, IOError, ParseError, WriteFailedError };

@@ -6,14 +6,16 @@ pub const max_size: usize = 32_768;
 
 pub const VirtualMachine: type = struct {
     io: std.Io,
+    writer: *std.Io.Writer,
     instructions: []instruction.Instructions,
     memory: [max_size]u8,
     ip: usize,
     memory_pointer: usize,
 
-    pub fn init(self: *VirtualMachine, io: std.Io) void {
+    pub fn init(self: *VirtualMachine, io: std.Io, writer: *std.Io.Writer) void {
         // std.debug.print("Initialize the VM...\n", .{});
         self.io = io;
+        self.writer = writer;
         self.ip = 0;
         self.memory_pointer = 0;
 
@@ -34,23 +36,13 @@ pub const VirtualMachine: type = struct {
     fn takeInput(self: *VirtualMachine) errors.Errors!void {
         var buf: [1]u8 = undefined;
         const stdin = std.Io.File.stdin();
-        std.debug.print("> ", .{});
+        // std.debug.print("> ", .{});
+        // self.writer.print("> ", .{}) catch return errors.Errors.WriteFailedError;
 
         var rdr = stdin.reader(self.io, &buf);
         const n = rdr.interface.readSliceShort(&buf) catch return errors.Errors.IOError;
         if (n == 0) return errors.Errors.IOError;
         self.memory[self.memory_pointer] = buf[0];
-
-        // flush remainder of line
-        var tmp: [1024]u8 = undefined;
-        var tmp_rdr = stdin.reader(self.io, &tmp);
-        while (true) {
-            const r = tmp_rdr.interface.readSliceShort(&tmp) catch break;
-            if (r == 0) break;
-            for (tmp[0..r]) |b| {
-                if (b == '\n' or b == '\r') return;
-            }
-        }
     }
 
     pub fn run(self: *VirtualMachine) errors.Errors!void {
@@ -80,7 +72,8 @@ pub const VirtualMachine: type = struct {
                     self.takeInput() catch return errors.Errors.IOError;
                 },
                 instruction.OpCode.OUTPUT => {
-                    std.debug.print("{c}", .{self.memory[self.memory_pointer]});
+                    // std.debug.print("{c}", .{self.memory[self.memory_pointer]});
+                    self.writer.print("{c}", .{self.memory[self.memory_pointer]}) catch return errors.Errors.WriteFailedError;
                 },
                 instruction.OpCode.JZ => {
                     if (self.memory[self.memory_pointer] == 0) {
