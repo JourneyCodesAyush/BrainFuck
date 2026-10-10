@@ -6,8 +6,17 @@
 #include "char_interpreter/interpreter.hpp"
 #include "runner/brainfuck-runner.hpp"
 
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#include <cstdio>
+#endif
+
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+    _setmode(_fileno(stdout), _O_BINARY);
+#endif
     try
     {
         std::ios::sync_with_stdio(false);
