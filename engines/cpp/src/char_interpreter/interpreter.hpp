@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stack>
+#include <vector>
 #include <unordered_map>
 #include <string>
 #include <cstdint>
@@ -18,7 +19,7 @@ namespace interpreter
         size_t instruction_pointer;
         int line;
         int memory_pointer;
-        std::uint8_t memory[MAX_SIZE] = {0};
+        std::vector<std::uint8_t> memory = std::vector<std::uint8_t>(MAX_SIZE, 0);
 
         std::stack<int> trace_brackets;
         std::unordered_map<int, int> brackets;
