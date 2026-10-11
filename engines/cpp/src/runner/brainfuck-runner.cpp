@@ -93,30 +93,16 @@ namespace runner
 
     void BrainFuckRunner::runCharInterpreter()
     {
-        try
-        {
-            this->intrprt.setSource(this->source);
-            this->intrprt.interpret();
-        }
-        catch (const std::exception &e)
-        {
-            throw e;
-        }
+        this->intrprt.setSource(this->source);
+        this->intrprt.interpret();
     }
 
     void BrainFuckRunner::runByteCodeVirtualMachine()
     {
-        try
-        {
-            this->prs.setSource(this->source);
-            auto instructions = this->prs.parse();
-            auto optimized = optimize(instructions);
-            this->vir_machine.setInstructions(optimized);
-            this->vir_machine.run();
-        }
-        catch (const std::exception &e)
-        {
-            throw e;
-        }
+        this->prs.setSource(this->source);
+        auto instructions = this->prs.parse();
+        auto optimized = optimize(instructions);
+        this->vir_machine.setInstructions(optimized);
+        this->vir_machine.run();
     }
 } // namespace runner
