@@ -34,6 +34,11 @@ namespace interpreter
 
     void Interpreter::sourceBracketsTrace()
     {
+        trace_brackets = std::stack<int>{};
+        brackets.clear();
+        line = 0;
+        instruction_pointer = 0;
+
         while (instruction_pointer < source.size())
         {
             // std::cout << "Tracing brackets...\n";
