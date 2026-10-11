@@ -105,4 +105,18 @@ namespace runner
         this->vir_machine.setInstructions(optimized);
         this->vir_machine.run();
     }
+
+    void BrainFuckRunner::runSource(const std::string &source)
+    {
+        this->source = source;
+
+        if (this->mode == Mode::CHAR)
+        {
+            this->runCharInterpreter();
+        }
+        else
+        {
+            this->runByteCodeVirtualMachine();
+        }
+    }
 } // namespace runner

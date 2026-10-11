@@ -35,5 +35,7 @@ namespace runner
         void runRepl();
         void runFromFile(const std::string &filename);
         void setMode(Mode mode);
+
+        void runSource(const std::string &source);
     };
 } // namespace runner
