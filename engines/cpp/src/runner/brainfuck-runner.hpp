@@ -31,7 +31,11 @@ namespace runner
         void printReplHelp();
 
     public:
-        BrainFuckRunner(Mode mode = Mode::CHAR) : source(""), mode(mode) {}
+        BrainFuckRunner(Mode mode = Mode::CHAR, std::istream &input_stream = std::cin) : source(""),
+                                                                                         intrprt(input_stream),
+                                                                                         prs(),
+                                                                                         vir_machine(input_stream),
+                                                                                         mode(mode) {}
         void runRepl();
         void runFromFile(const std::string &filename);
         void setMode(Mode mode);
