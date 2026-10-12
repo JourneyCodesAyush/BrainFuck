@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <exception>
+#include <stdexcept>
 #include <fstream>
 #include <filesystem>
 #include <sstream>
@@ -28,6 +29,7 @@ namespace runner
     void BrainFuckRunner::runRepl()
     {
         this->printReplHelp();
+
         while (true)
         {
             std::cin.clear();
@@ -44,17 +46,23 @@ namespace runner
                 std::cout << "\nExiting BrainF*ck REPL...\n\n";
                 break;
             }
-
-            if (!source.empty())
-            { // only run non-empty input
-                if (this->mode == Mode::CHAR)
-                {
-                    this->runCharInterpreter();
+            try
+            {
+                if (!source.empty())
+                { // only run non-empty input
+                    if (this->mode == Mode::CHAR)
+                    {
+                        this->runCharInterpreter();
+                    }
+                    else
+                    {
+                        this->runByteCodeVirtualMachine();
+                    }
                 }
-                else
-                {
-                    this->runByteCodeVirtualMachine();
-                }
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << "ERROR: " << e.what() << '\n';
             }
         }
     }
@@ -75,8 +83,7 @@ namespace runner
         std::ifstream source_file(filename);
         if (!source_file.is_open())
         {
-            std::cerr << "Could not open file " << filename << "\n!";
-            exit(EXIT_FAILURE);
+            throw std::runtime_error("Could not open file " + filename);
         }
         source << source_file.rdbuf();
         this->source = source.str();

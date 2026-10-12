@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include <cstdint>
 
 #include "interpreter.hpp"
@@ -56,8 +57,8 @@ namespace interpreter
             case ']':
                 if (trace_brackets.empty())
                 {
-                    std::cerr << "Unbalanced bracket at position " << instruction_pointer << "\n";
-                    exit(EXIT_FAILURE);
+                    throw std::runtime_error(
+                        "Unbalanced bracket at position " + std::to_string(instruction_pointer));
                 }
                 popped = trace_brackets.top();
                 trace_brackets.pop();
@@ -74,14 +75,10 @@ namespace interpreter
 
         if (!trace_brackets.empty())
         {
-            std::cerr << "Unbalanced bracket(s): missing closing ] for [ at position(s): ";
-            while (!trace_brackets.empty())
-            {
-                std::cerr << trace_brackets.top() << " ";
-                trace_brackets.pop();
-            }
-            std::cerr << "\nLine number: " << line << "\n";
-            exit(EXIT_FAILURE);
+            throw std::runtime_error(
+                "Unbalanced bracket: missing closing ']' for '[' "
+                "at position " +
+                std::to_string(trace_brackets.top()));
         }
 
         // std::cout << "Tracing complete...\n";
@@ -158,52 +155,46 @@ namespace interpreter
     void Interpreter::interpret()
     {
         // std::cout << "Inside interpret method..\n";
-        try
+        while (instruction_pointer < source.size())
         {
-            while (instruction_pointer < source.size())
+            char c = source.at(instruction_pointer);
+            switch (c)
             {
-                char c = source.at(instruction_pointer);
-                switch (c)
-                {
-                case '>':
-                    incrementMemoryPointer();
-                    break;
-                case '<':
-                    decrementMemoryPointer();
-                    break;
-                case '.':
-                    printMemoryPointer();
-                    break;
-                case ',':
-                    // std::cout << "> ";
-                    takeInput();
-                    break;
-                case '+':
-                    incrementMemoryValue();
-                    break;
-                case '-':
-                    decrementMemoryValue();
-                    break;
+            case '>':
+                incrementMemoryPointer();
+                break;
+            case '<':
+                decrementMemoryPointer();
+                break;
+            case '.':
+                printMemoryPointer();
+                break;
+            case ',':
+                // std::cout << "> ";
+                takeInput();
+                break;
+            case '+':
+                incrementMemoryValue();
+                break;
+            case '-':
+                decrementMemoryValue();
+                break;
 
-                case '[':
-                    if (memory[memory_pointer] == 0)
-                        instruction_pointer = brackets[instruction_pointer];
-                    break;
-                case ']':
-                    if (memory[memory_pointer] != 0)
-                        instruction_pointer = brackets[instruction_pointer];
-                    break;
-                default:
-                    // std::cout << "Comment encountered...\n";
-                    break;
-                }
-                advance();
+            case '[':
+                if (memory[memory_pointer] == 0)
+                    instruction_pointer = brackets[instruction_pointer];
+                break;
+            case ']':
+                if (memory[memory_pointer] != 0)
+                    instruction_pointer = brackets[instruction_pointer];
+                break;
+            default:
+                // std::cout << "Comment encountered...\n";
+                break;
             }
+            advance();
         }
-        catch (const std::exception &e)
-        {
-            std::cerr << e.what() << '\n';
-        }
+
         // std::cout << "\n";
     }
 
