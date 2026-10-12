@@ -84,7 +84,7 @@ std::vector<instruction::Instruction> optimize(const std::vector<instruction::In
         else if (optimized[i].opcode == instruction::OpCode::JNZ)
         {
             if (loop_stack.empty())
-                throw std::runtime_error("Unmatched instruction JNZ\n");
+                throw std::runtime_error("Unmatched instruction JNZ");
             size_t start_idx = loop_stack.top();
             loop_stack.pop();
             optimized[start_idx].argument = i;
@@ -93,7 +93,7 @@ std::vector<instruction::Instruction> optimize(const std::vector<instruction::In
     }
 
     if (!loop_stack.empty())
-        throw std::runtime_error("Unmatched instruction JZ\n");
+        throw std::runtime_error("Unmatched instruction JZ");
 
     return optimized;
 }

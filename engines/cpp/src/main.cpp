@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                throw std::runtime_error("Unknown argument: " + arg + "\n");
+                throw std::runtime_error("Unknown argument: " + arg);
             }
         }
 
