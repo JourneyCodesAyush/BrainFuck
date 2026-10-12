@@ -61,6 +61,6 @@ ifeq ($(OS),Windows_NT)
 	del /Q $(WEB_DIR)/brainfuck.wasm || true
 
 else
-rm -f $(BUILD_DIR)/*.o
-rm -f $(TARGET)
+	rm -f $(WEB_DIR)/brainfuck.js
+	rm -f $(WEB_DIR)/brainfuck.wasm
 endif
