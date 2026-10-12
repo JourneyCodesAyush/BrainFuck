@@ -41,3 +41,6 @@ Thumbs.db
 # Zig files
 .zig-cache/
 zig-out/
+
+brainfuck.js
+brainfuck.wasm
