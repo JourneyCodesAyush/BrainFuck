@@ -38,6 +38,8 @@ OBJ := $(subst \,/,$(OBJ))
 # Ensure build directory exists
 $(shell $(MKDIR))
 
+.PHONY: clean web web-serve
+
 # Build executable
 $(TARGET): $(OBJ)
 	$(CC) $(BUILD_FLAGS) -I $(INC_DIR) -o $(TARGET) $(OBJ)
@@ -61,3 +63,9 @@ else
 	rm -f $(BUILD_DIR)/*.o
 	rm -f $(TARGET)
 endif
+
+web:
+	$(MAKE) -f WebMakefile clean-web all
+
+web-serve:
+	$(MAKE) -f WebMakefile serve
