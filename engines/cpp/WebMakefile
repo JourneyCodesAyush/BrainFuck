@@ -1,0 +1,66 @@
+# Compiler and flags
+CC = em++
+
+CFLAGS = -Wall -std=c++17
+RELEASE_FLAGS = -O2
+BUILD_FLAGS = $(CFLAGS) $(RELEASE_FLAGS)
+
+ifeq ($(OS),Windows_NT)
+PYTHON = python
+else
+PYTHON = python3
+endif
+
+# Source and include directories
+SRC_DIR = src
+WEB_DIR = web
+
+# Find all C++ source files except the native entry point
+SRC = $(filter-out $(SRC_DIR)/main.cpp,$(wildcard $(SRC_DIR)/*.cpp))
+
+# Find all header files
+HDR = $(wildcard $(SRC_DIR)/*.hpp)
+
+# Find all directories to use as include paths
+
+INC_DIRS = $(SRC_DIR)
+INC_FLAGS = $(addprefix -I,$(INC_DIRS))
+
+# WebAssembly target
+
+WEB_API = $(WEB_DIR)/web_api.cpp
+TARGET = $(WEB_DIR)/brainfuck.js
+
+EM_FLAGS = $(BUILD_FLAGS) $(INC_FLAGS) \
+    --no-entry \
+    -sMODULARIZE=1 \
+    -sEXPORT_ES6=1 \
+    -sEXPORTED_FUNCTIONS='["_run_brainfuck"]' \
+    -sEXPORTED_RUNTIME_METHODS='["ccall"]' \
+    -sALLOW_MEMORY_GROWTH=1 \
+    -sSTACK_SIZE=1048576 \
+    -sINITIAL_MEMORY=67108864 \
+    -sASSERTIONS=2 \
+    -sSTACK_OVERFLOW_CHECK=2
+
+.PHONY: all web serve clean-web
+
+all: web
+
+web: $(TARGET)
+
+$(TARGET): $(SRC) $(HDR) $(WEB_API)
+	$(CC) $(EM_FLAGS) $(WEB_API) $(SRC) -o $(TARGET)
+
+serve:
+	$(PYTHON) -m http.server 8000 -d web
+
+clean-web:
+ifeq ($(OS),Windows_NT)
+	del /Q $(WEB_DIR)/brainfuck.js || true
+	del /Q $(WEB_DIR)/brainfuck.wasm || true
+
+else
+rm -f $(BUILD_DIR)/*.o
+rm -f $(TARGET)
+endif
