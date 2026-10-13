@@ -24,6 +24,8 @@ This project is designed as an **experimental runtime for Brainfuck**, exploring
 - Detects unmatched brackets
 - Prevents pointer underflow
 - Optional **REPL mode**
+- WebAssembly build for browser-based execution
+- JavaScript API for running Brainfuck source through the C++ runtime
 
 ---
 
@@ -142,6 +144,43 @@ Specify engine:
 
 ---
 
+## WebAssembly Frontend
+
+The C++ runtime can be compiled to WebAssembly using Emscripten,
+allowing it to run in a browser through a JavaScript frontend.
+
+### Build
+
+Ensure Emscripten is installed and activated, then run:
+
+```bash
+make web
+```
+
+This generates the JavaScript module and WebAssembly binary in `web/`:
+
+- `web/brainfuck.js`
+- `web/brainfuck.wasm`
+
+### Run locally
+
+Start a local HTTP server:
+
+```bash
+make web-serve
+```
+
+Open the local URL printed by the server in your browser.
+
+To remove generated web build artifacts:
+
+```bash
+make clean
+```
+
+
+---
+
 ## Example
 
 Run the included example program:
@@ -178,7 +217,15 @@ engines/
     │   │
     │   └── runner/
     │
+    ├── web/
+    │   ├── web_api.cpp
+    │   ├── index.html
+    │   ├── app.js
+    │   ├── brainfuck.js # generated
+    │   └── brainfuck.wasm # generated
+    │
     ├── Makefile
+    ├── WebMakefile
     └── README.md # You are reading it!
 ```
 
@@ -198,6 +245,11 @@ Brainfuck Source
 ```
 
 The runner selects the execution engine based on the **`--mode` flag**.
+
+
+The WebAssembly frontend calls the C++ runtime through the JavaScript
+API exposed by `web/web_api.cpp`. The browser loads the generated
+JavaScript module and its corresponding WebAssembly binary.
 
 ---
 
