@@ -55,10 +55,10 @@ $(foreach src,$(SRC),$(eval $(call make_compile_rule,$(src))))
 
 # Clean build files
 clean:
+	$(MAKE) -f WebMakefile clean-web
 ifeq ($(OS),Windows_NT)
-	del /Q $(BUILD_DIR)\*.o 2> NUL || true
-	del /Q $(TARGET) 2> NUL || true
-
+	del /Q "$(BUILD_DIR)\*.o" 2>NUL
+	del /Q "$(TARGET)" 2>NUL
 else
 	rm -f $(BUILD_DIR)/*.o
 	rm -f $(TARGET)
