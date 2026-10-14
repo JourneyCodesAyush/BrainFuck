@@ -190,10 +190,33 @@
             font-size: 0.8rem;
         }
 
+        footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
         footer span {
-            padding: 6px 10px;
-            border: 1px solid #374151;
-            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 999px;
+            background: rgba(31, 41, 55, 0.45);
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+            transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+
+        footer span:hover {
+            border-color: rgba(96, 165, 250, 0.55);
+            background: rgba(59, 130, 246, 0.1);
+            color: #e2e8f0;
         }
 
         @media (max-width: 520px) {
