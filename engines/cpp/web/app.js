@@ -25,10 +25,10 @@ async function initialize() {
 }
 
 runButton.addEventListener("click", () => {
-    console.log("Run button clicked");
+    // console.log("Run button clicked");
 
     if (!moduleInstance) {
-        console.error("WebAssembly module is not initialized");
+        // console.error("WebAssembly module is not initialized");
         statusElement.textContent = "WebAssembly is not ready.";
         return;
     }
@@ -38,7 +38,7 @@ runButton.addEventListener("click", () => {
     statusElement.textContent = "Executing program...";
 
     try {
-        console.log("Export:", typeof moduleInstance._run_brainfuck);
+        // console.log("Export:", typeof moduleInstance._run_brainfuck);
 
         const result = moduleInstance.ccall(
             "run_brainfuck",
@@ -51,7 +51,7 @@ runButton.addEventListener("click", () => {
             ]
         );
 
-        console.log("Execution result:", result);
+        // console.log("Execution result:", result);
         outputElement.textContent = result ?? "";
         statusElement.textContent = "Execution finished.";
     } catch (error) {
