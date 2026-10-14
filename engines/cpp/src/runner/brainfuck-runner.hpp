@@ -1,45 +1,36 @@
 #pragma once
 
-#include <string>
-
 #include "char_interpreter/interpreter.hpp"
 #include "ir_vm/instruction/OpCode.hpp"
-#include "ir_vm/parser/parser.hpp"
 #include "ir_vm/optimization/optimizer.hpp"
+#include "ir_vm/parser/parser.hpp"
 #include "ir_vm/virtual-machine/vm.hpp"
 
-namespace runner
-{
-    enum class Mode
-    {
-        CHAR,
-        IR
-    };
+#include <string>
 
-    class BrainFuckRunner
-    {
-    private:
-        std::string source;
-        interpreter::Interpreter intrprt;
-        parser::Parser prs;
-        vm::VirtualMachine vir_machine;
-        Mode mode;
+namespace runner {
+enum class Mode { CHAR, IR };
 
-        void runCharInterpreter();
-        void runByteCodeVirtualMachine();
+class BrainFuckRunner {
+  private:
+    std::string source;
+    interpreter::Interpreter intrprt;
+    parser::Parser prs;
+    vm::VirtualMachine vir_machine;
+    Mode mode;
 
-        void printReplHelp();
+    void runCharInterpreter();
+    void runByteCodeVirtualMachine();
 
-    public:
-        BrainFuckRunner(Mode mode = Mode::CHAR, std::istream &input_stream = std::cin) : source(""),
-                                                                                         intrprt(input_stream),
-                                                                                         prs(),
-                                                                                         vir_machine(input_stream),
-                                                                                         mode(mode) {}
-        void runRepl();
-        void runFromFile(const std::string &filename);
-        void setMode(Mode mode);
+    void printReplHelp();
 
-        void runSource(const std::string &source);
-    };
+  public:
+    BrainFuckRunner(Mode mode = Mode::CHAR, std::istream& input_stream = std::cin)
+        : source(""), intrprt(input_stream), prs(), vir_machine(input_stream), mode(mode) {}
+    void runRepl();
+    void runFromFile(const std::string& filename);
+    void setMode(Mode mode);
+
+    void runSource(const std::string& source);
+};
 } // namespace runner

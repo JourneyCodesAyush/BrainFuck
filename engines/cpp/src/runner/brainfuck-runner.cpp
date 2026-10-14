@@ -1,128 +1,103 @@
 #include "brainfuck-runner.hpp"
 
 #include <algorithm>
-#include <iostream>
-#include <stdexcept>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
 
-namespace runner
-{
-    void BrainFuckRunner::setMode(Mode mode)
-    {
-        this->mode = mode;
-    }
-    void BrainFuckRunner::printReplHelp()
-    {
-        std::cout << " ____            _       _____           _    \n"
-                  << "| __ ) _ __ __ _(_)_ __ |  ___|_/\\__ ___| | __\n"
-                  << "|  _ \\| '__/ _` | | '_ \\| |_  \\    // __| |/ /\n"
-                  << "| |_) | | | (_| | | | | |  _| /_  _\\ (__|   < \n"
-                  << "|____/|_|  \\__,_|_|_| |_|_|     \\/  \\___|_|\\_\\\n";
+namespace runner {
+void BrainFuckRunner::setMode(Mode mode) {
+    this->mode = mode;
+}
+void BrainFuckRunner::printReplHelp() {
+    std::cout << " ____            _       _____           _    \n"
+              << "| __ ) _ __ __ _(_)_ __ |  ___|_/\\__ ___| | __\n"
+              << "|  _ \\| '__/ _` | | '_ \\| |_  \\    // __| |/ /\n"
+              << "| |_) | | | (_| | | | | |  _| /_  _\\ (__|   < \n"
+              << "|____/|_|  \\__,_|_|_| |_|_|     \\/  \\___|_|\\_\\\n";
 
-        std::cout << "\nStart with this 'Hello World' program\n";
-        std::cout << "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>\n\n";
-    }
+    std::cout << "\nStart with this 'Hello World' program\n";
+    std::cout << "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++"
+                 "++.>.+++.------.--------.>+.>\n\n";
+}
 
-    void BrainFuckRunner::runRepl()
-    {
-        this->printReplHelp();
+void BrainFuckRunner::runRepl() {
+    this->printReplHelp();
 
-        while (true)
-        {
-            std::cin.clear();
-            std::cout << "$ ";
-            if (!std::getline(std::cin, this->source))
-            {
-                // End-of-file (Ctrl+D / Ctrl+Z)
-                std::cout << "\nExiting BrainF*ck REPL...\n\n";
-                break;
-            }
+    while (true) {
+        std::cin.clear();
+        std::cout << "$ ";
+        if (!std::getline(std::cin, this->source)) {
+            // End-of-file (Ctrl+D / Ctrl+Z)
+            std::cout << "\nExiting BrainF*ck REPL...\n\n";
+            break;
+        }
 
-            if (source == "q" || source == "quit" || source == "exit")
-            {
-                std::cout << "\nExiting BrainF*ck REPL...\n\n";
-                break;
-            }
-            try
-            {
-                if (!source.empty())
-                { // only run non-empty input
-                    if (this->mode == Mode::CHAR)
-                    {
-                        this->runCharInterpreter();
-                    }
-                    else
-                    {
-                        this->runByteCodeVirtualMachine();
-                    }
+        if (source == "q" || source == "quit" || source == "exit") {
+            std::cout << "\nExiting BrainF*ck REPL...\n\n";
+            break;
+        }
+        try {
+            if (!source.empty()) { // only run non-empty input
+                if (this->mode == Mode::CHAR) {
+                    this->runCharInterpreter();
+                } else {
+                    this->runByteCodeVirtualMachine();
                 }
             }
-            catch (const std::exception &e)
-            {
-                std::cerr << "ERROR: " << e.what() << '\n';
-            }
+        } catch (const std::exception& e) {
+            std::cerr << "ERROR: " << e.what() << '\n';
         }
     }
+}
 
-    void BrainFuckRunner::runFromFile(const std::string &filename)
-    {
-        namespace fs = std::filesystem;
-        auto file = fs::path(filename);
+void BrainFuckRunner::runFromFile(const std::string& filename) {
+    namespace fs = std::filesystem;
+    auto file = fs::path(filename);
 
-        auto ext = file.extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-        if (!((ext == ".bf") || (ext == ".b")))
-        {
-            throw std::runtime_error("Invalid file extension!");
-        }
-
-        std::stringstream source;
-        std::ifstream source_file(filename);
-        if (!source_file.is_open())
-        {
-            throw std::runtime_error("Could not open file " + filename);
-        }
-        source << source_file.rdbuf();
-        this->source = source.str();
-
-        if (this->mode == Mode::CHAR)
-        {
-            this->runCharInterpreter();
-        }
-        else
-        {
-            this->runByteCodeVirtualMachine();
-        }
+    auto ext = file.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (!((ext == ".bf") || (ext == ".b"))) {
+        throw std::runtime_error("Invalid file extension!");
     }
 
-    void BrainFuckRunner::runCharInterpreter()
-    {
-        this->intrprt.setSource(this->source);
-        this->intrprt.interpret();
+    std::stringstream source;
+    std::ifstream source_file(filename);
+    if (!source_file.is_open()) {
+        throw std::runtime_error("Could not open file " + filename);
     }
+    source << source_file.rdbuf();
+    this->source = source.str();
 
-    void BrainFuckRunner::runByteCodeVirtualMachine()
-    {
-        this->prs.setSource(this->source);
-        auto instructions = this->prs.parse();
-        auto optimized = optimize(instructions);
-        this->vir_machine.setInstructions(optimized);
-        this->vir_machine.run();
+    if (this->mode == Mode::CHAR) {
+        this->runCharInterpreter();
+    } else {
+        this->runByteCodeVirtualMachine();
     }
+}
 
-    void BrainFuckRunner::runSource(const std::string &source)
-    {
-        this->source = source;
+void BrainFuckRunner::runCharInterpreter() {
+    this->intrprt.setSource(this->source);
+    this->intrprt.interpret();
+}
 
-        if (this->mode == Mode::CHAR)
-        {
-            this->runCharInterpreter();
-        }
-        else
-        {
-            this->runByteCodeVirtualMachine();
-        }
+void BrainFuckRunner::runByteCodeVirtualMachine() {
+    this->prs.setSource(this->source);
+    auto instructions = this->prs.parse();
+    auto optimized = optimize(instructions);
+    this->vir_machine.setInstructions(optimized);
+    this->vir_machine.run();
+}
+
+void BrainFuckRunner::runSource(const std::string& source) {
+    this->source = source;
+
+    if (this->mode == Mode::CHAR) {
+        this->runCharInterpreter();
+    } else {
+        this->runByteCodeVirtualMachine();
     }
+}
 } // namespace runner
