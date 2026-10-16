@@ -125,21 +125,21 @@ You can type Brainfuck code directly.
 Build:
 
 ```bash
-cd engines/cpp
-make
+meson setup build
+meson compile -C build
 ```
 
 Run a program:
 
 ```bash
-./brainfuck program.bf # Character interpreter is the default mode
+./build/brainfuck program.bf # Character interpreter is the default mode
 ```
 
 Specify engine:
 
 ```bash
-./brainfuck program.bf --mode=char
-./brainfuck program.bf --mode=ir
+./build/brainfuck program.bf --mode=char
+./build/brainfuck program.bf --mode=ir
 ```
 
 ---
@@ -154,20 +154,25 @@ allowing it to run in a browser through a JavaScript frontend.
 Ensure Emscripten is installed and activated, then run:
 
 ```bash
-make web
+meson setup build-web --cross-file emscripten.ini
+meson compile -C build-web
 ```
 
-This generates the JavaScript module and WebAssembly binary in `web/`:
+This generates the JavaScript module and WebAssembly binary in `build-web/` alongside the copied frontend files:
 
-- `web/brainfuck.js`
-- `web/brainfuck.wasm`
+- `build-web/index.html`
+- `build-web/app.js`
+- `build-web/brainfuck.js`
+- `build-web/brainfuck.wasm`
 
 ### Run locally
+
+Serve `build-web/`, not the source `web/` directory. Open `http://localhost:8000` in your browser.
 
 Start a local HTTP server:
 
 ```bash
-make web-serve
+meson compile -C build-web serve
 ```
 
 Open the local URL printed by the server in your browser.
@@ -175,7 +180,11 @@ Open the local URL printed by the server in your browser.
 To remove generated web build artifacts:
 
 ```bash
-make clean
+rm -rf build build-web
+```
+
+```ps1
+Remove-Item -Recurse -Force build build-web
 ```
 
 
@@ -186,13 +195,13 @@ make clean
 Run the included example program:
 
 ```bash
-./brainfuck ../../examples/hello_world.bf
+./build/brainfuck ../../examples/hello_world.bf
 ```
 
 or explicitly use the IR engine:
 
 ```bash
-./brainfuck ../../examples/hello_world.bf --mode=ir
+./build/brainfuck ../../examples/hello_world.bf --mode=ir
 ```
 
 ---
@@ -220,12 +229,10 @@ engines/
     ├── web/
     │   ├── web_api.cpp
     │   ├── index.html
-    │   ├── app.js
-    │   ├── brainfuck.js # generated
-    │   └── brainfuck.wasm # generated
+    │   └── app.js
     │
-    ├── Makefile
-    ├── WebMakefile
+    ├── emscripten.ini
+    ├── meson.build
     └── README.md # You are reading it!
 ```
 

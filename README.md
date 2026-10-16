@@ -17,6 +17,9 @@
   - [Quick Install](#quick-install)
     - [C++](#c-1)
     - [Zig](#zig-1)
+  - [WebAssembly Frontend (C++)](#webassembly-frontend-c)
+    - [Build](#build)
+    - [Run locally](#run-locally)
   - [Usage](#usage)
   - [Examples](#examples)
     - [Hello World](#hello-world)
@@ -64,6 +67,8 @@ Features:
 - Runtime engine selection
 - Optional REPL mode
 - IR instruction collapsing optimization
+- Meson-based build system
+- WebAssembly build for browser-based execution
 
 Execution engines:
 
@@ -95,8 +100,9 @@ Execution engines:
 
 ```bash
 cd engines/cpp
-make
-./brainfuck hello.bf
+meson setup build
+meson compile -C build
+./build/brainfuck hello.bf
 ```
 
 ### Zig
@@ -109,20 +115,44 @@ zig build
 
 ---
 
+## WebAssembly Frontend (C++)
+
+The C++ runtime can be compiled to WebAssembly using Emscripten and executed in a browser.
+
+### Build
+
+Ensure Meson, Ninja, Python 3, and Emscripten are installed.
+
+```bash
+cd engines/cpp
+meson setup build-web --cross-file emscripten.ini
+meson compile -C build-web
+```
+
+### Run locally
+
+```bash
+meson compile -C build-web serve
+```
+
+Open `http://localhost:8000` in your browser. The server serves `build-web/`, which contains `index.html`, `app.js`, `brainfuck.js`, and `brainfuck.wasm`.
+
+---
+
 ## Usage
 
 All engines run by passing a `.bf` file as a command-line argument. Example:
 
 ```bash
-./brainfuck program.bf
+./build/brainfuck program.bf
 ./zig-out/bin/brainfuck program.bf
 ```
 
 The C++ engine also supports selecting the execution mode:
 
 ```bash
-./brainfuck program.bf --mode=char
-./brainfuck program.bf --mode=ir
+./build/brainfuck program.bf --mode=char
+./build/brainfuck program.bf --mode=ir
 ```
 
 ---
@@ -162,7 +192,7 @@ Type a character, and it will be printed back.
 ### Build Configuration
 
 - **Zig**: ReleaseFast
-- **C++**: -O3
+- **C++**: `-O2` (Meson)
 
 ---
 
@@ -212,7 +242,8 @@ brainfuck
 ├── engines/
 │   ├── cpp/
 │   │   ├── src/          # C++ interpreter sources
-│   │   └── Makefile
+│   │   ├── meson.build
+│   │   └── emscripten.ini
 │   └── zig/
 │       ├── src/          # Zig interpreter sources
 │       ├── build.zig
