@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 import tempfile
@@ -5,24 +6,38 @@ from pathlib import Path
 
 TIMEOUT_SECONDS: int = 2
 
+ROOT_DIR = Path(__file__).resolve().parent
+
+BUILD_DIRS: dict[str, Path] = {
+    "cpp": ROOT_DIR / "engines" / "cpp" / "build",
+    "zig": ROOT_DIR / "engines" / "zig" / "zig-out" / "bin",
+}
+
+
+def executable_path(engine: str) -> Path:
+    """Return the platform-specific executable path."""
+    executable_name = "brainfuck.exe" if os.name == "nt" else "brainfuck"
+    return BUILD_DIRS[engine] / executable_name
+
+
 IMPLEMENTATIONS: dict[str, list[str]] = {
     "cpp-char": [
-        "./engines/cpp/brainfuck.exe",
+        str(executable_path("cpp")),
         "--mode=char",
         "{source}",
     ],
     "cpp-ir": [
-        "./engines/cpp/brainfuck.exe",
+        str(executable_path("cpp")),
         "--mode=ir",
         "{source}",
     ],
     "zig-char": [
-        "./engines/zig/zig-out/bin/brainfuck.exe",
+        str(executable_path("zig")),
         "--mode=char",
         "{source}",
     ],
     "zig-ir": [
-        "./engines/zig/zig-out/bin/brainfuck.exe",
+        str(executable_path("zig")),
         "--mode=ir",
         "{source}",
     ],
@@ -154,6 +169,7 @@ def run_test(command: list[str], test: dict[str, str]) -> tuple[bool, str]:
                 stderr=subprocess.PIPE,
                 timeout=TIMEOUT_SECONDS,
                 check=False,
+                cwd=ROOT_DIR,
             )
 
         except subprocess.TimeoutExpired:
