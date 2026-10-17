@@ -33,11 +33,14 @@ jobs:
         run: pre-commit run --all-files
 
   build:
-    name: Build interpreters
+    name: Build and test interpreters
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
 
       - name: Install C++ build tools
         run: |
@@ -58,3 +61,6 @@ jobs:
       - name: Build Zig
         working-directory: engines/zig
         run: zig build
+
+      - name: Test all interpreters
+        run: python test_runner.py
