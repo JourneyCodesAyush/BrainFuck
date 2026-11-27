@@ -64,7 +64,7 @@ pub const Runner = struct {
                 std.mem.eql(u8, trimmed, "quit") or
                 std.mem.eql(u8, trimmed, "exit"))
             {
-                std.debug.print("Exiting BrainF*ck REPL...\n", .{});
+                self.writer.print("Exiting BrainF*ck REPL...\n", .{}) catch return errors.Errors.WriteFailedError;
                 return;
             }
 
@@ -88,7 +88,8 @@ pub const Runner = struct {
                 }
             }
 
-            std.debug.print("\n", .{});
+            self.writer.writeByte('\n') catch return errors.Errors.WriteFailedError;
+            self.writer.flush() catch return errors.Errors.WriteFailedError;
         }
     }
 
