@@ -51,18 +51,13 @@ pub const Runner = struct {
     pub fn runRepl(self: *Runner) errors.Errors!void {
         printReplHelp();
 
-        const stdin = std.Io.File.stdin();
-        var buf: [1024]u8 = undefined;
-
         while (true) {
             // std.debug.print("$ ", .{});
 
-            var rdr = stdin.reader(self.io, &buf);
-            const len = rdr.interface.readSliceShort(&buf) catch {
+            const line = self.reader.takeDelimiter('\n') catch {
                 return errors.Errors.IOError;
-            };
+            } orelse return;
 
-            const line = buf[0..len];
             const trimmed = std.mem.trim(u8, line, "\r\n");
 
             if (std.mem.eql(u8, trimmed, "q") or
