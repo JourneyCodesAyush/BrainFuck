@@ -6,15 +6,17 @@ pub const max_size: usize = 32_768;
 
 pub const VirtualMachine: type = struct {
     io: std.Io,
+    reader: *std.Io.Reader,
     writer: *std.Io.Writer,
     instructions: []instruction.Instructions,
     memory: [max_size]u8,
     ip: usize,
     memory_pointer: usize,
 
-    pub fn init(self: *VirtualMachine, io: std.Io, writer: *std.Io.Writer) void {
+    pub fn init(self: *VirtualMachine, io: std.Io, reader: *std.Io.Reader, writer: *std.Io.Writer) void {
         // std.debug.print("Initialize the VM...\n", .{});
         self.io = io;
+        self.reader = reader;
         self.writer = writer;
         self.ip = 0;
         self.memory_pointer = 0;
@@ -34,15 +36,8 @@ pub const VirtualMachine: type = struct {
     }
 
     fn takeInput(self: *VirtualMachine) errors.Errors!void {
-        var buf: [1]u8 = undefined;
-        const stdin = std.Io.File.stdin();
-        // std.debug.print("> ", .{});
-        // self.writer.print("> ", .{}) catch return errors.Errors.WriteFailedError;
-
-        var rdr = stdin.reader(self.io, &buf);
-        const n = rdr.interface.readSliceShort(&buf) catch return errors.Errors.IOError;
-        if (n == 0) return errors.Errors.IOError;
-        self.memory[self.memory_pointer] = buf[0];
+        const byte = self.reader.takeByte() catch return errors.Errors.IOError;
+        self.memory[self.memory_pointer] = byte;
     }
 
     pub fn run(self: *VirtualMachine) errors.Errors!void {

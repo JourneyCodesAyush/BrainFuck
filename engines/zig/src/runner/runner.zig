@@ -14,22 +14,24 @@ pub const Runner = struct {
     source: []u8,
     io: std.Io,
     allocator: std.mem.Allocator,
+    reader: *std.Io.Reader,
     writer: *std.Io.Writer,
     prs: parser.Parser = undefined,
     vir_mac: vm.VirtualMachine = undefined,
     intrprt: intrpreter.Interpreter = undefined,
     optimize: optimizer.Optimizer = undefined,
 
-    pub fn init(self: *Runner, io: std.Io, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
+    pub fn init(self: *Runner, io: std.Io, reader: *std.Io.Reader, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
         self.io = io;
+        self.reader = reader;
         self.writer = writer;
         self.allocator = allocator;
         self.source = &[_]u8{};
 
-        try self.intrprt.init("", self.io, self.writer, self.allocator);
+        try self.intrprt.init("", self.io, self.reader, self.writer, self.allocator);
         try self.prs.init("", self.allocator);
         try self.optimize.init(self.allocator);
-        self.vir_mac.init(self.io, self.writer);
+        self.vir_mac.init(self.io, self.reader, self.writer);
     }
 
     pub fn deinit(self: *Runner) void {

@@ -29,6 +29,11 @@ pub fn main(init: std.process.Init) !void {
     const stdout_writer = &stdout_file_writer.interface;
     defer stdout_writer.flush() catch {};
 
+    // Buffered reader over stdin
+    var stdin_buffer: [1024]u8 = undefined;
+    var stdin_file_reader: Io.File.Reader = .init(.stdin(), init.io, &stdin_buffer);
+    const stdin_reader = &stdin_file_reader.interface;
+
     // const args = try std.process.argsAlloc(allocator);
     // defer std.process.argsFree(allocator, args);
 
@@ -60,7 +65,7 @@ pub fn main(init: std.process.Init) !void {
     }
 
     var rnr: runner.Runner = undefined;
-    try rnr.init(init.io, stdout_writer, allocator);
+    try rnr.init(init.io, stdin_reader, stdout_writer, allocator);
 
     rnr.setMode(mode);
     if (filename.len != 0) {
