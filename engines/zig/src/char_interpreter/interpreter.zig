@@ -114,7 +114,7 @@ pub const Interpreter = struct {
                     // std.debug.print("{c}", .{
                     //     self.memory[self.memory_pointer],
                     // });
-                    self.writer.print("{c}", .{self.memory[self.memory_pointer]}) catch return errors.Errors.WriteFailedError;
+                    self.writer.writeByte(self.memory[self.memory_pointer]) catch return errors.Errors.WriteFailedError;
                 },
                 ',' => {
                     try self.takeInput();
@@ -137,5 +137,6 @@ pub const Interpreter = struct {
             // self.instruction_pointer += 1;
             self.advance();
         }
+        self.writer.flush() catch return errors.Errors.WriteFailedError;
     }
 };

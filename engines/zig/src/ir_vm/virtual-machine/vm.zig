@@ -68,7 +68,7 @@ pub const VirtualMachine: type = struct {
                 },
                 instruction.OpCode.OUTPUT => {
                     // std.debug.print("{c}", .{self.memory[self.memory_pointer]});
-                    self.writer.print("{c}", .{self.memory[self.memory_pointer]}) catch return errors.Errors.WriteFailedError;
+                    self.writer.writeByte(self.memory[self.memory_pointer]) catch return errors.Errors.WriteFailedError;
                 },
                 instruction.OpCode.JZ => {
                     if (self.memory[self.memory_pointer] == 0) {
@@ -87,5 +87,6 @@ pub const VirtualMachine: type = struct {
             if (!advanced)
                 self.advance();
         }
+        self.writer.flush() catch return errors.Errors.WriteFailedError;
     }
 };
