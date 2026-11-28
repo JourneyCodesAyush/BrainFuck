@@ -1,8 +1,11 @@
+//! Parses Brainfuck source code into instructions for the IR virtual machine.
+
 const std: type = @import("std");
 const instruction: type = @import("../instructions/opcode.zig");
 
 const errors = @import("../../errors/error.zig");
 
+/// Converts Brainfuck commands into VM instructions and resolves loop jumps.
 pub const Parser = struct {
     current: usize,
     source: []const u8,
@@ -29,6 +32,7 @@ pub const Parser = struct {
         self.current = 0;
     }
 
+    /// Parses the source and returns the generated instruction sequence.
     pub fn parse(self: *Parser) errors.Errors![]instruction.Instructions {
         self.resetState();
         while (self.current < self.source.len) {

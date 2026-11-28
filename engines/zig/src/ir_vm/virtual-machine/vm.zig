@@ -1,9 +1,13 @@
+//! Executes optimized intermediate representation instructions using a fixed-size memory tape.
+
 const std: type = @import("std");
 const instruction: type = @import("../instructions/opcode.zig");
 const errors = @import("../../errors/error.zig");
 
+/// Number of memory cells available to the virtual machine.
 pub const max_size: usize = 32_768;
 
+/// Executes IR instructions while managing memory, control flow, and I/O.
 pub const VirtualMachine: type = struct {
     io: std.Io,
     reader: *std.Io.Reader,
@@ -38,6 +42,7 @@ pub const VirtualMachine: type = struct {
         self.memory[self.memory_pointer] = byte;
     }
 
+    /// Executes instructions until the instruction sequence is exhausted.
     pub fn run(self: *VirtualMachine) errors.Errors!void {
         var instr: instruction.Instructions = undefined;
         var advanced: bool = undefined;
@@ -74,11 +79,12 @@ pub const VirtualMachine: type = struct {
                 instruction.OpCode.JNZ => {
                     if (self.memory[self.memory_pointer] != 0) {
                         self.ip = @intCast(instr.argument);
-                        advanced = true;
+                        advanced = true; // Prevent advancing the instruction pointer after a jump.
                     }
                 },
             }
 
+            // Jump instructions update the instruction pointer directly.
             if (!advanced)
                 self.advance();
         }

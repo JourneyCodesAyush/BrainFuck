@@ -1,3 +1,5 @@
+//! Coordinates source execution through the character-based interpreter or the IR virtual machine.
+
 const std = @import("std");
 const instruction = @import("../ir_vm/instructions/opcode.zig");
 const intrpreter = @import("../char_interpreter/interpreter.zig");
@@ -7,8 +9,10 @@ const optimizer = @import("../ir_vm/optimization/optimizer.zig");
 
 const errors = @import("../errors/error.zig");
 
+/// Determines which execution engine the runner uses.
 pub const Mode = enum { CHAR, IR };
 
+/// Manages source input, execution engines, and the Brainfuck REPL.
 pub const Runner = struct {
     mode: Mode,
     source: []u8,
@@ -21,6 +25,7 @@ pub const Runner = struct {
     intrprt: intrpreter.Interpreter = undefined,
     optimize: optimizer.Optimizer = undefined,
 
+    /// Initializes the execution engines and their shared I/O resources.
     pub fn init(self: *Runner, io: std.Io, reader: *std.Io.Reader, writer: *std.Io.Writer, allocator: std.mem.Allocator) errors.Errors!void {
         self.io = io;
         self.reader = reader;
@@ -34,6 +39,7 @@ pub const Runner = struct {
         self.vir_mac.init(self.io, self.reader, self.writer);
     }
 
+    /// Releases resources owned by the runner and its execution engines.
     pub fn deinit(self: *Runner) void {
         self.intrprt.deinit();
         self.prs.deinit();
@@ -44,10 +50,12 @@ pub const Runner = struct {
         }
     }
 
+    /// Sets the execution mode.
     pub fn setMode(self: *Runner, mode: Mode) void {
         self.mode = mode;
     }
 
+    /// Starts an interactive REPL for executing Brainfuck source code.
     pub fn runRepl(self: *Runner) errors.Errors!void {
         printReplHelp();
 
@@ -91,6 +99,7 @@ pub const Runner = struct {
         }
     }
 
+    /// Loads and executes Brainfuck source code from a file.
     pub fn runFromFile(self: *Runner, filename: []const u8) errors.Errors!void {
         if (!(std.mem.endsWith(u8, filename, ".b") or std.mem.endsWith(u8, filename, ".bf"))) {
             std.debug.print("Use .b or .bf extension for BrainF*ck source files\n", .{});
@@ -153,11 +162,13 @@ pub const Runner = struct {
         }
     }
 
+    /// Executes the current source using the character-based interpreter.
     fn runCharInterpreter(self: *Runner) errors.Errors!void {
         try self.intrprt.setSource(self.source);
         try self.intrprt.interpret();
     }
 
+    /// Parses, optimizes, and executes the current source using the IR virtual machine.
     fn runByteCodeVirtualMachine(self: *Runner) errors.Errors!void {
         self.prs.setSource(self.source);
         const instr: []instruction.Instructions = try self.prs.parse();

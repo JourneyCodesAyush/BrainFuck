@@ -1,8 +1,11 @@
+//! Optimizes IR instructions by combining consecutive operations and resolving loop jumps.
+
 const std = @import("std");
 const instruction = @import("../instructions/opcode.zig");
 const errors = @import("../../errors/error.zig");
 const max_move: i32 = @import("../virtual-machine/vm.zig").max_size;
 
+/// Optimizes the parsed instruction sequence before execution by the virtual machine.
 pub const Optimizer: type = struct {
     raw: []instruction.Instructions,
     optimized: std.ArrayList(instruction.Instructions) = .empty,
@@ -26,6 +29,8 @@ pub const Optimizer: type = struct {
         self.loop_stack.clearRetainingCapacity();
     }
 
+    /// Combines consecutive arithmetic and memory movement instructions,
+    /// then recalculates loop jump destinations.
     pub fn optimize(self: *Optimizer) errors.Errors![]instruction.Instructions {
         for (self.raw) |curr| {
             if (self.optimized.items.len != 0) {

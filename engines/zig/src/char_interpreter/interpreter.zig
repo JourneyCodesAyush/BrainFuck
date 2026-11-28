@@ -1,7 +1,12 @@
+//! Implements the character-based Brainfuck interpreter.
+
 const std = @import("std");
 const errors = @import("../errors/error.zig");
+
+/// Number of memory cells available to the interpreter.
 const max_size: usize = 32_768;
 
+/// Executes Brainfuck source code directly using a fixed-size memory tape.
 pub const Interpreter = struct {
     memory: [max_size]u8,
     instruction_pointer: usize,
@@ -88,13 +93,14 @@ pub const Interpreter = struct {
         self.instruction_pointer += 1;
     }
 
+    /// Precomputes bracket matching when new source code is provided.
     pub fn setSource(self: *Interpreter, source_code: []const u8) errors.Errors!void {
         self.source = source_code;
 
         self.brackets.clearRetainingCapacity();
         self.trace_brackets.clearRetainingCapacity();
 
-        // Compute brackets when source is set instead of at run time
+        // Precomputes bracket matching when new source code is provided.
         self.resetInstructionPointer();
         try self.sourceBracketsTrace();
         self.resetInstructionPointer();

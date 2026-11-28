@@ -1,3 +1,5 @@
+//! Application entry point responsible for CLI configuration and runner initialization.
+
 const std = @import("std");
 
 const Io = std.Io;
@@ -6,6 +8,7 @@ const errors = @import("./errors/error.zig");
 
 const runner = @import("./runner/runner.zig");
 
+/// Prints an error message to standard error.
 fn handleError(err: errors.Errors) void {
     switch (err) {
         errors.Errors.IOError => std.debug.print("IOError", .{}),
@@ -17,6 +20,7 @@ fn handleError(err: errors.Errors) void {
     }
 }
 
+/// Initializes the application, processes CLI arguments, and starts the runner.
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
 
