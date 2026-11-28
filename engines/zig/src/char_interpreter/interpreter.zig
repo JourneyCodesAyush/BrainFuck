@@ -31,7 +31,6 @@ pub const Interpreter = struct {
 
     pub fn deinit(self: *Interpreter) void {
         self.trace_brackets.deinit(self.allocator);
-        // self.allocator.free(self.brackets);
         self.brackets.deinit();
     }
 
@@ -111,9 +110,6 @@ pub const Interpreter = struct {
                 '+' => self.incrementMemoryValue(),
                 '-' => self.decrementMemoryValue(),
                 '.' => {
-                    // std.debug.print("{c}", .{
-                    //     self.memory[self.memory_pointer],
-                    // });
                     self.writer.writeByte(self.memory[self.memory_pointer]) catch return errors.Errors.WriteFailedError;
                 },
                 ',' => {
@@ -134,7 +130,6 @@ pub const Interpreter = struct {
                 else => {},
             }
 
-            // self.instruction_pointer += 1;
             self.advance();
         }
         self.writer.flush() catch return errors.Errors.WriteFailedError;

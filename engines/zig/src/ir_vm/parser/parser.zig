@@ -12,7 +12,6 @@ pub const Parser = struct {
     allocator: std.mem.Allocator,
 
     pub fn init(self: *Parser, source: []const u8, allocator: std.mem.Allocator) !void {
-        // std.debug.print("Initializing the parser...\n", .{});
         self.source = source;
         self.allocator = allocator;
         self.current = 0;
@@ -21,7 +20,6 @@ pub const Parser = struct {
     }
 
     pub fn deinit(self: *Parser) void {
-        // std.debug.print("Deinitializing the parser...\n", .{});
         self.array.deinit(self.allocator);
         self.loop_stack.deinit(self.allocator);
     }
@@ -32,7 +30,6 @@ pub const Parser = struct {
     }
 
     pub fn parse(self: *Parser) errors.Errors![]instruction.Instructions {
-        // std.debug.print("Parsing the raw code to IR...\n", .{});
         self.resetState();
         while (self.current < self.source.len) {
             switch (self.source[self.current]) {

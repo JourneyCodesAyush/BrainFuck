@@ -14,7 +14,6 @@ pub const VirtualMachine: type = struct {
     memory_pointer: usize,
 
     pub fn init(self: *VirtualMachine, io: std.Io, reader: *std.Io.Reader, writer: *std.Io.Writer) void {
-        // std.debug.print("Initialize the VM...\n", .{});
         self.io = io;
         self.reader = reader;
         self.writer = writer;
@@ -25,7 +24,6 @@ pub const VirtualMachine: type = struct {
     }
 
     pub fn setInstructions(self: *VirtualMachine, instructions: []instruction.Instructions) void {
-        // std.debug.print("Set instructions...\n", .{});
         self.instructions = instructions;
         self.ip = 0;
         self.memory_pointer = 0;
@@ -43,12 +41,10 @@ pub const VirtualMachine: type = struct {
     pub fn run(self: *VirtualMachine) errors.Errors!void {
         var instr: instruction.Instructions = undefined;
         var advanced: bool = undefined;
-        // std.debug.print("Running the VM...\n", .{});
+
         while (self.ip < self.instructions.len) {
-            // std.debug.print("Inside the loop running VM..\n", .{});
             advanced = false;
             instr = self.instructions[self.ip];
-            // std.debug.print("IP: {d}\n", .{self.ip});
             switch (instr.opcode) {
                 instruction.OpCode.ADD => {
                     const idx = self.memory_pointer;
@@ -67,7 +63,6 @@ pub const VirtualMachine: type = struct {
                     self.takeInput() catch return errors.Errors.IOError;
                 },
                 instruction.OpCode.OUTPUT => {
-                    // std.debug.print("{c}", .{self.memory[self.memory_pointer]});
                     self.writer.writeByte(self.memory[self.memory_pointer]) catch return errors.Errors.WriteFailedError;
                 },
                 instruction.OpCode.JZ => {

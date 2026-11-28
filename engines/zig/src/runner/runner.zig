@@ -52,8 +52,6 @@ pub const Runner = struct {
         printReplHelp();
 
         while (true) {
-            // std.debug.print("$ ", .{});
-
             const line = self.reader.takeDelimiter('\n') catch {
                 return errors.Errors.IOError;
             } orelse return;
@@ -112,16 +110,6 @@ pub const Runner = struct {
         const source = accumulator.toOwnedSlice() catch return errors.Errors.OutOfMemory;
         self.setSourceOwned(source);
 
-        // const source = std.fs.cwd().readFileAlloc(
-        //     self.allocator,
-        //     filename,
-        //     10 * 1024 * 1024,
-        // ) catch {
-        //     return errors.Errors.IOError;
-        // };
-
-        // self.setSourceOwned(source);
-
         switch (self.mode) {
             Mode.CHAR => {
                 try self.runCharInterpreter();
@@ -175,7 +163,6 @@ pub const Runner = struct {
         const instr: []instruction.Instructions = try self.prs.parse();
         self.optimize.setRaw(instr);
         const optimized = try self.optimize.optimize();
-        // self.vir_mac.setInstructions(instr);
         self.vir_mac.setInstructions(optimized);
         try self.vir_mac.run();
     }

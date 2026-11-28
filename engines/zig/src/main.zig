@@ -34,9 +34,6 @@ pub fn main(init: std.process.Init) !void {
     var stdin_file_reader: Io.File.Reader = .init(.stdin(), init.io, &stdin_buffer);
     const stdin_reader = &stdin_file_reader.interface;
 
-    // const args = try std.process.argsAlloc(allocator);
-    // defer std.process.argsFree(allocator, args);
-
     const args = init.minimal.args.toSlice(allocator) catch {
         handleError(errors.Errors.IOError);
         return errors.Errors.IOError;
