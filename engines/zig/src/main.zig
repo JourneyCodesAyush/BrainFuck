@@ -65,6 +65,8 @@ pub fn main(init: std.process.Init) !void {
     }
 
     var rnr: runner.Runner = undefined;
+    defer rnr.deinit();
+
     try rnr.init(init.io, stdin_reader, stdout_writer, allocator);
 
     rnr.setMode(mode);
@@ -77,5 +79,4 @@ pub fn main(init: std.process.Init) !void {
             handleError(err);
         };
     }
-    defer rnr.deinit();
 }
